@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using HMACSerialiser.Errors;
+using HMACSerialiser.HMAC;
 
 namespace HMACSerialiser
 {

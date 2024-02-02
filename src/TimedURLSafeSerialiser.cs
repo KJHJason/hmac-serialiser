@@ -1,5 +1,6 @@
-﻿using HMACSerialiser.Base64Encoders;
-using System;
+﻿using System;
+using HMACSerialiser.Base64Encoders;
+using HMACSerialiser.HMAC;
 
 namespace HMACSerialiser
 {

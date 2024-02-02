@@ -5,6 +5,7 @@ using System.Text.Json;
 using HMACSerialiser.Base64Encoders;
 using HMACSerialiser.Errors;
 using HMACSerialiser.KFD;
+using HMACSerialiser.HMAC;
 
 namespace HMACSerialiser
 {

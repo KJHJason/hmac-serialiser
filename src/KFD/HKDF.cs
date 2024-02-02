@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using static HMACSerialiser.HMACHelper;
+using static HMACSerialiser.HMAC.HMACHelper;
 
 namespace HMACSerialiser.KFD
 {

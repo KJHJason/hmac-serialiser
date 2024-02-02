@@ -2,7 +2,7 @@
 using System.Text;
 using System.Security.Cryptography;
 
-namespace HMACSerialiser
+namespace HMACSerialiser.HMAC
 {
     public static class HMACHelper
     {

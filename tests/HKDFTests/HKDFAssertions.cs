@@ -1,9 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using HMACSerialiser.Base64Encoders;
-using HMACSerialiser;
 using HMACSerialiser.KFD;
 using System.Text;
+using HMACSerialiser.HMAC;
 
 namespace HMACSerialiserTests
 {
