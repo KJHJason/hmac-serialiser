@@ -6,7 +6,7 @@ This is a simple serialiser that uses HMAC to sign the data before serialising i
 
 This started off to address the use of `SHA256(message | secretKey)` in the company I was attached to during my internship which is susceptible to length extension attacks.
 
-Hence, I started developing this library as a side project after work and it is heavily inspired by Python's [ItsDangerous](https://github.com/pallets/itsdangerous/tree/main) library with various modifications like using HKDF (RFC 5869) for the key derivation.
+Hence, I started developing this library as a side project after work and it is heavily inspired by Python's [ItsDangerous](https://github.com/pallets/itsdangerous) library with various modifications like using HKDF (RFC 5869) for the key derivation.
 
 ## Security Considerations
 
@@ -82,7 +82,7 @@ string token = serialiser.Dumps(data);
 
 try 
 {
-    string message = serialiser.Loads(token);
+    string message = serialiser.LoadsString(token);
     Assert.Equal(data, message);
 }
 catch (BadTokenException) 
@@ -105,7 +105,7 @@ string token = serialiser.Dumps(data);
 
 try 
 {
-    string message = serialiser.Loads(token);
+    string message = serialiser.LoadsString(token);
     Assert.Equal(data, message);
 }
 catch (BadTokenException) 
@@ -134,7 +134,7 @@ string token = serialiser.Dumps(data);
 
 try 
 {
-    string message = serialiser.Loads(token);
+    string message = serialiser.LoadsString(token);
     Assert.Equal(data, message);
 }
 catch (BadTokenException) 
