@@ -72,19 +72,13 @@ namespace HMACSerialiser.HMAC
         public static byte[] ConvertToBytes(object value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             if (value is byte[] byteArray)
-            {
                 return byteArray;
-            }
 
             if (value is string stringValue)
-            {
                 return Encoding.UTF8.GetBytes(stringValue);
-            }
 
             throw new ArgumentException("Unsupported type for key or salt");
         }

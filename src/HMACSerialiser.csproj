@@ -8,7 +8,7 @@
     <Authors>KJHJason</Authors>
     <Description>HMAC Serialisers to cryptographically sign data like Python's ItsDangerous library.</Description>
     <Copyright>MIT License</Copyright>
-    <BaseOutputPath>F:\Nuget</BaseOutputPath>
+    <BaseOutputPath>C:\Nuget</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

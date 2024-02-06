@@ -6,13 +6,18 @@ using HMACSerialiser.HMAC;
 
 namespace HMACSerialiser
 {
-    public class TimedSerialiser : Serialiser
+    public class TimedSerialiser : Serialiser, ITimedSerialiser
     {
         private readonly long _maxAge; // in seconds
 
         public TimedSerialiser(
-            object key, object salt, long maxAge, string sep = HMACHelper.DefaultSeparator, HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm)
-                : base(key, salt, sep, hashAlgorithm)
+            object key, 
+            object salt,
+            long maxAge, 
+            HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm,
+			object info = null,
+			string sep = HMACHelper.DefaultSeparator)
+                : base(key, salt, hashAlgorithm, info, sep)
         {
             _maxAge = maxAge;
         }
@@ -40,10 +45,10 @@ namespace HMACSerialiser
             return (data, timestamp, signature);
         }
 
-        public override string Dumps(object data)
+        public string Dumps(object data, DateTimeOffset dateTime)
         {
             string encodedData = Base64Encode(SerialiseObject(data));
-            byte[] timestamp = BitConverter.GetBytes(((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds());
+            byte[] timestamp = Encoding.UTF8.GetBytes(dateTime.ToUnixTimeSeconds().ToString());
             string encodedTimestamp = Base64Encode(timestamp);
 
             // combine data, separator and timestamp (all are in bytes)
@@ -58,6 +63,9 @@ namespace HMACSerialiser
             return dataString + _sep + signature;
         }
 
+        public override string Dumps(object data)
+            => Dumps(data, DateTimeOffset.UtcNow);
+
         protected override string LoadsLogic(string signedToken)
         {
 
@@ -71,9 +79,9 @@ namespace HMACSerialiser
             if (!HMACHelper.CompareDigest(mac, signature))
                 throw new BadTokenException("Data has been tampered or signature does not match");
 
-            long timestamp = BitConverter.ToInt64(Base64Decode(encodedTimestamp), 0);
+            long timestamp = long.Parse(Encoding.UTF8.GetString(Base64Decode(encodedTimestamp)));
             long age = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - timestamp;
-            if (age > _maxAge)
+            if (age >= _maxAge)
                 throw new BadTokenException("Signature has expired");
 
             return encodedData;

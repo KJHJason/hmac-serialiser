@@ -1,5 +1,4 @@
-﻿using System;
-using HMACSerialiser.Base64Encoders;
+﻿using HMACSerialiser.Base64Encoders;
 using HMACSerialiser.HMAC;
 
 namespace HMACSerialiser
@@ -7,8 +6,12 @@ namespace HMACSerialiser
     public class TimedURLSafeSerialiser : TimedSerialiser
     {
         public TimedURLSafeSerialiser(
-            object key, object salt, long maxAge, string sep = HMACHelper.DefaultSeparator, HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm)
-                : base(key, salt, maxAge, sep, hashAlgorithm)
+            object key, 
+            object salt, 
+            long maxAge, HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm, 
+            object info = null,
+            string sep = HMACHelper.DefaultSeparator)
+                : base(key, salt, maxAge, hashAlgorithm, info, sep)
         {
         }
 

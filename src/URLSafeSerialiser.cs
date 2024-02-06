@@ -1,5 +1,4 @@
-﻿using System;
-using HMACSerialiser.Base64Encoders;
+﻿using HMACSerialiser.Base64Encoders;
 using HMACSerialiser.HMAC;
 
 namespace HMACSerialiser
@@ -7,8 +6,12 @@ namespace HMACSerialiser
     public class URLSafeSerialiser : Serialiser
     {
         public URLSafeSerialiser(
-            object key, object salt, string sep = HMACHelper.DefaultSeparator, HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm)
-                : base(key, salt, sep, hashAlgorithm)
+            object key, 
+            object salt, 
+            HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm,
+			object info = null,
+			string sep = HMACHelper.DefaultSeparator)
+                : base(key, salt, hashAlgorithm, info, sep)
         {
         }
 

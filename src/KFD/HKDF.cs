@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using static HMACSerialiser.HMAC.HMACHelper;
 
 namespace HMACSerialiser.KFD
@@ -42,7 +40,6 @@ namespace HMACSerialiser.KFD
 
             return okm;
         }
-
 
         private static byte[] ConcatenateArrays(params byte[][] arrays)
         {

@@ -1,23 +1,30 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using HMACSerialiser.Base64Encoders;
 using HMACSerialiser.Errors;
 using HMACSerialiser.KFD;
 using HMACSerialiser.HMAC;
+using System.Diagnostics;
 
 namespace HMACSerialiser
 {
-    public class Serialiser
+    public class Serialiser : ISerialiser
     {
         protected readonly string _sep; // separator
         protected readonly byte[] _key;
         protected readonly byte[] _salt;
+        protected readonly byte[] _info;
         protected readonly HMACHelper.HMACHashAlgorithm _hashAlgorithm;
 
-        public Serialiser(object key, object salt, string sep = HMACHelper.DefaultSeparator, HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm)
+        public Serialiser(
+            object key, 
+            object salt, 
+            HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm, 
+            object info = null, 
+            string sep = HMACHelper.DefaultSeparator)
         {
+            _info = HMACHelper.ConvertToBytes(info);
             _hashAlgorithm = hashAlgorithm;
             _sep = sep;
             CheckSepIsValid();
@@ -42,8 +49,10 @@ namespace HMACSerialiser
                 hashFunction: _hashAlgorithm,
                 ikm: _key,
                 salt: _salt,
+                info: _info,
                 outputLen: HMACHelper.GetLengthForHKDF(_hashAlgorithm)
             );
+            // Debug.WriteLine($"Key: {Base64Encode(key)}");
             return key;
         }
 
@@ -73,8 +82,8 @@ namespace HMACSerialiser
         protected string DeserialiseString(string encodedData)
             => Encoding.UTF8.GetString(Base64Decode(encodedData));
 
-        protected JsonDocument DeserialiseObject(string encodedData)
-            => JsonDocument.Parse(DeserialiseString(encodedData));
+        protected JSONPayload DeserialiseObject(string encodedData)
+            => new JSONPayload(JsonDocument.Parse(DeserialiseString(encodedData)));
 
         protected string CombineData(params byte[][] data)
         {
@@ -142,7 +151,7 @@ namespace HMACSerialiser
             return DeserialiseString(encodedData);
         }
 
-        public virtual JsonDocument Loads(string signedToken)
+        public JSONPayload Loads(string signedToken)
         {
             string encodedData = LoadsLogic(signedToken);
             return DeserialiseObject(encodedData);

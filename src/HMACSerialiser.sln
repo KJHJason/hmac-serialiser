@@ -5,7 +5,9 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HMACSerialiser", "HMACSerialiser.csproj", "{C794281E-5C93-43D2-844F-782C14D20434}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HKDFTests", "..\tests\HKDFTests\HKDFTests.csproj", "{712FC552-6544-44CC-9C3F-19CFC2C3DC96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HKDFTests", "..\tests\HKDFTests\HKDFTests.csproj", "{712FC552-6544-44CC-9C3F-19CFC2C3DC96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HMACTests", "..\tests\HMACTests\HMACTests.csproj", "{BDDB4A7E-966A-45DC-B5F9-23732AEB5107}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{712FC552-6544-44CC-9C3F-19CFC2C3DC96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{712FC552-6544-44CC-9C3F-19CFC2C3DC96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{712FC552-6544-44CC-9C3F-19CFC2C3DC96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDDB4A7E-966A-45DC-B5F9-23732AEB5107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDDB4A7E-966A-45DC-B5F9-23732AEB5107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDDB4A7E-966A-45DC-B5F9-23732AEB5107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDDB4A7E-966A-45DC-B5F9-23732AEB5107}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
