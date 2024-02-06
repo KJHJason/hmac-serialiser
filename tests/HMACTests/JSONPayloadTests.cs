@@ -5,59 +5,61 @@ using HMACSerialiser;
 
 namespace HMACTests
 {
-	[TestClass]
-	public class JSONPayloadTests : BaseTestClass
-	{
-		[TestMethod]
-		public void ValidJsonPayload()
-		{
-			// sample data
-			string username = "Jason";
-			int age = 20;
-			DateTime created = DateTime.Now;
-			double wallet = 10.00;
-			bool verified = true;
-			List<string> sessions = new List<string> 
-			{ 
-				"session1", "session2" 
-			};
-			var family = new Dictionary<string, string> 
-			{ 
-				{ "father", "John" }, 
-				{ "mother", "Jane" },
-			};
+    [TestClass]
+    public class JSONPayloadTests : BaseTestClass
+    {
+        [TestMethod]
+        public void ValidJsonPayload()
+        {
+            // sample data
+            string username = "Jason";
+            int age = 20;
+            DateTime created = DateTime.Now;
+            double wallet = 10.00;
+            bool verified = true;
+            List<string> sessions = new List<string> 
+            {
+                "session1",
+                "session2"
+            };
+            var family = new Dictionary<string, string> 
+            {
+                { "father", "John"},
+                { "mother", "Jane" },
+            };
 
-			// create a JSON object
-			object data = new { 
-				username,
+            // create a JSON object
+            object data = new
+            {
+                username,
                 age,
-				created,
-				wallet,
-				verified,
-				sessions,
-				family,
-			};
+                created,
+                wallet,
+                verified,
+                sessions,
+                family,
+            };
 
-			var serialisers = GetAllSerialisers();
-			foreach (var serialiserByHashFunc in serialisers.GetList())
-			{
+            var serialisers = GetAllSerialisers();
+            foreach (var serialiserByHashFunc in serialisers.GetList())
+            {
                 foreach (var serialiser in serialiserByHashFunc)
-				{
-					JSONPayload result;
-					try
-					{
+                {
+                    JSONPayload result;
+                    try
+                    {
                         string signed = serialiser.Dumps(data);
                         result = serialiser.Loads(signed);
                     }
                     catch (Exception e)
-					{
+                    {
                         Assert.Fail($"Unexpected exception: {e.Message}");
-						return;
+                        return;
                     }
 
-					string fallbackEmail = "notexist@mail.com";
-					string actualEmail = result.Get("email", fallbackEmail);
-					Assert.AreEqual(fallbackEmail, actualEmail);
+                    string fallbackEmail = "notexist@mail.com";
+                    string actualEmail = result.Get("email", fallbackEmail);
+                    Assert.AreEqual(fallbackEmail, actualEmail);
 
                     string actualUsername = result.Get<string>("username");
                     Assert.AreEqual(username, actualUsername);
@@ -81,6 +83,6 @@ namespace HMACTests
                     CollectionAssert.AreEqual(family, actualFamily);
                 }
             }
-		}
-	}
+        }
+    }
 }

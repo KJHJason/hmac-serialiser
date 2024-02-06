@@ -7,14 +7,14 @@ using HMACSerialiser;
 
 namespace HMACTests
 {
-	[TestClass]
-	public class ValidSignatureTests : BaseTestClass
-	{
-		private const string _key = "secretkey";
-		private const string _salt = "randomsalt";
-		private const string _info = "testing";
-		private const int _maxAge = 3600;
-		private const string _data = "KJHJason/HMACSerialiser";
+    [TestClass]
+    public class ValidSignatureTests : BaseTestClass
+    {
+        private const string _key = "secretkey";
+        private const string _salt = "randomsalt";
+        private const string _info = "testing";
+        private const int _maxAge = 3600;
+        private const string _data = "KJHJason/HMACSerialiser";
         private static readonly DateTimeOffset _dateTime = new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero); // 1706745600 (Unix time)
 
         private static readonly string encodedData = Convert.ToBase64String(Encoding.UTF8.GetBytes(_data));
@@ -24,13 +24,12 @@ namespace HMACTests
         private static readonly string encodedUnixTime = Convert.ToBase64String(timestampBytes);
         private static readonly string urlsafeEncodedUnixTime = URLSafeBase64Encoder.Base64Encode(timestampBytes);
 
-
-        protected override ISerialiser[] InitialiseAllSerialisers(object key, object salt, HMACHashAlgorithm hashFunction, object info, int maxAge)
-           => new ISerialiser[]
-           {
+        protected override ISerialiser[] InitialiseAllSerialisers(object key, object salt, HMACHashAlgorithm hashFunction, object info, int maxAge) 
+            => new ISerialiser[] 
+            {
                 new Serialiser(key, salt, hashFunction, info),
                 new URLSafeSerialiser(key, salt, hashFunction, info),
-           };
+            };
 
         private void TestsOutputs(ISerialiser[] serialisers, string[] expected)
         {
@@ -58,13 +57,13 @@ namespace HMACTests
 
         [TestMethod]
         public void HMACSHA1Serialisers()
-		{
+        {
             ISerialiser[] serialisers = InitialiseAllSerialisers(
-				_key, _salt, HMACHashAlgorithm.SHA1, _info, 0);
+                _key, _salt, HMACHashAlgorithm.SHA1, _info, 0);
 
             // [Serialiser, URLSafeSerialiser]
-            string[] expected = new string[]
-			{
+            string[] expected = new string[] 
+            {
                 $"{encodedData}.Xz4h5lldXM2j6ZFo6VuGGA0B5+I=",
                 $"{urlsafeEncodedData}.Xz4h5lldXM2j6ZFo6VuGGA0B5-I=",
             };
@@ -78,7 +77,7 @@ namespace HMACTests
                 _key, _salt, HMACHashAlgorithm.SHA1, _info, _maxAge);
 
             // [TimedSerialiser, TimedURLSafeSerialiser]
-            string[] expected = new string[]
+            string[] expected = new string[] 
             {
                 $"{encodedData}.{encodedUnixTime}.tEy7zeJ97QbUGPFRlOhSs+lwvBE=",
                 $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.tEy7zeJ97QbUGPFRlOhSs-lwvBE=",
@@ -99,7 +98,7 @@ namespace HMACTests
                 _key, _salt, HMACHashAlgorithm.SHA256, _info, 0);
 
             // [Serialiser, URLSafeSerialiser]
-            string[] expected = new string[]
+            string[] expected = new string[] 
             {
                 $"{encodedData}.RXqJxlU3oAbDve2Mknw2HYblpFhjxnopK6IEdCFeUqs=",
                 $"{urlsafeEncodedData}.RXqJxlU3oAbDve2Mknw2HYblpFhjxnopK6IEdCFeUqs=",
@@ -114,7 +113,7 @@ namespace HMACTests
                 _key, _salt, HMACHashAlgorithm.SHA256, _info, _maxAge);
 
             // [TimedSerialiser, TimedURLSafeSerialiser]
-            string[] expected = new string[]
+            string[] expected = new string[] 
             {
                 $"{encodedData}.{encodedUnixTime}.eLOxS2h4C5aeudi6DNc9N53LFvN3KCZrtbF0tIk0/y8=",
                 $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.eLOxS2h4C5aeudi6DNc9N53LFvN3KCZrtbF0tIk0_y8=",
@@ -135,7 +134,7 @@ namespace HMACTests
                 _key, _salt, HMACHashAlgorithm.SHA384, _info, 0);
 
             // [Serialiser, URLSafeSerialiser]
-            string[] expected = new string[]
+            string[] expected = new string[] 
             {
                 $"{encodedData}.9w4JAhHckAI3I8fKy0L9Bq+3RYxtrvk4KelxWIsv6MuaVpEJsaQ4sWxyvNkiaXPQ",
                 $"{urlsafeEncodedData}.9w4JAhHckAI3I8fKy0L9Bq-3RYxtrvk4KelxWIsv6MuaVpEJsaQ4sWxyvNkiaXPQ",
@@ -150,7 +149,7 @@ namespace HMACTests
                 _key, _salt, HMACHashAlgorithm.SHA384, _info, _maxAge);
 
             // [TimedSerialiser, TimedURLSafeSerialiser]
-            string[] expected = new string[]
+            string[] expected = new string[] 
             {
                 $"{encodedData}.{encodedUnixTime}.l50UItfiTIHxr0WrzXEMPwe0LMZqO3pFSOfFu3c369xJds34cTLhi7w+pXQ04x+f",
                 $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.l50UItfiTIHxr0WrzXEMPwe0LMZqO3pFSOfFu3c369xJds34cTLhi7w-pXQ04x-f",
@@ -171,7 +170,7 @@ namespace HMACTests
                 _key, _salt, HMACHashAlgorithm.SHA512, _info, 0);
 
             // [Serialiser, URLSafeSerialiser]
-            string[] expected = new string[]
+            string[] expected = new string[] 
             {
                 $"{encodedData}.wifr1DwcDlp0q3wUCErD2uKh37+T7BRvomIjD23c7KWJXa0sfF0X3daokxvuY2LDNtISvwRTj5cZxWE1tA4JJw==",
                 $"{urlsafeEncodedData}.wifr1DwcDlp0q3wUCErD2uKh37-T7BRvomIjD23c7KWJXa0sfF0X3daokxvuY2LDNtISvwRTj5cZxWE1tA4JJw==",
@@ -186,7 +185,7 @@ namespace HMACTests
                 _key, _salt, HMACHashAlgorithm.SHA512, _info, _maxAge);
 
             // [TimedSerialiser, TimedURLSafeSerialiser]
-            string[] expected = new string[]
+            string[] expected = new string[] 
             {
                 $"{encodedData}.{encodedUnixTime}.kXtK/hFtErgVRpsPuLuuOt4rOLuuAdsOJVgsGMOKcAYQjWh6dhdyklw+DPRJJ/2Zx1LK8mstAW2/HMTH4PZHPA==",
                 $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.kXtK_hFtErgVRpsPuLuuOt4rOLuuAdsOJVgsGMOKcAYQjWh6dhdyklw-DPRJJ_2Zx1LK8mstAW2_HMTH4PZHPA==",
