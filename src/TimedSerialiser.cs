@@ -1,90 +1,90 @@
-﻿using    System;
-using    System.Linq;
-using    System.Text;
-using    HMACSerialiser.Errors;
-using    HMACSerialiser.HMAC;
+﻿using System;
+using System.Linq;
+using System.Text;
+using HMACSerialiser.Errors;
+using HMACSerialiser.HMAC;
 
-namespace    HMACSerialiser
+namespace HMACSerialiser
 {
-                public    class    TimedSerialiser    :    Serialiser,    ITimedSerialiser
-                {
-                                private    readonly    long    _maxAge;    //    in    seconds
+    public class TimedSerialiser : Serialiser, ITimedSerialiser
+    {
+        private readonly long _maxAge; // in seconds
 
-                                public    TimedSerialiser(
-                                                object    key,    
-                                                object    salt,
-                                                long    maxAge,    
-                                                HMACHelper.HMACHashAlgorithm    hashAlgorithm    =    HMACHelper.DefaultAlgorithm,
-                                                object    info    =    null,
-                                                string    sep    =    HMACHelper.DefaultSeparator)
-                                                                :    base(key,    salt,    hashAlgorithm,    info,    sep)
-                                {
-                                                _maxAge    =    maxAge;
-                                }
+        public TimedSerialiser(
+            object key, 
+            object salt,
+            long maxAge, 
+            HMACHelper.HMACHashAlgorithm hashAlgorithm = HMACHelper.DefaultAlgorithm,
+			object info = null,
+			string sep = HMACHelper.DefaultSeparator)
+                : base(key, salt, hashAlgorithm, info, sep)
+        {
+            _maxAge = maxAge;
+        }
 
-                                protected    (string    data,    string    timestamp,    byte[]    signature)    SplitTokenWithTimestamp(string    signedToken)
-                                {
-                                                var    split    =    signedToken.Split(_sep);
-                                                if    (split.Length    !=    3)
-                                                                throw    new    BadTokenException("Invalid    token    format");
+        protected (string data, string timestamp, byte[] signature) SplitTokenWithTimestamp(string signedToken)
+        {
+            var split = signedToken.Split(_sep);
+            if (split.Length != 3)
+                throw new BadTokenException("Invalid token format");
 
-                                                string    data,    timestamp;
-                                                byte[]    signature;
-                                                try
-                                                {
-                                                                //    all    are    base64    encoded
-                                                                data    =    split[0];
-                                                                timestamp    =    split[1];
-                                                                signature    =    Base64Decode(split[2]);
-                                                }
-                                                catch    (FormatException)
-                                                {
-                                                                throw    new    BadTokenException("Data    or    signature    is    not    base64    encoded");
-                                                }
+            string data, timestamp;
+            byte[] signature;
+            try
+            {
+                // all are base64 encoded
+                data = split[0];
+                timestamp = split[1];
+                signature = Base64Decode(split[2]);
+            }
+            catch (FormatException)
+            {
+                throw new BadTokenException("Data or signature is not base64 encoded");
+            }
 
-                                                return    (data,    timestamp,    signature);
-                                }
+            return (data, timestamp, signature);
+        }
 
-                                public    string    Dumps(object    data,    DateTimeOffset    dateTime)
-                                {
-                                                string    encodedData    =    Base64Encode(SerialiseObject(data));
-                                                byte[]    timestamp    =    Encoding.UTF8.GetBytes(dateTime.ToUnixTimeSeconds().ToString());
-                                                string    encodedTimestamp    =    Base64Encode(timestamp);
+        public string Dumps(object data, DateTimeOffset dateTime)
+        {
+            string encodedData = Base64Encode(SerialiseObject(data));
+            byte[] timestamp = Encoding.UTF8.GetBytes(dateTime.ToUnixTimeSeconds().ToString());
+            string encodedTimestamp = Base64Encode(timestamp);
 
-                                                //    combine    data,    separator    and    timestamp    (all    are    in    bytes)
-                                                byte[]    combined    =    Encoding.UTF8.GetBytes(encodedData)
-                                                                .Concat(Encoding.UTF8.GetBytes(_sep))
-                                                                .Concat(Encoding.UTF8.GetBytes(encodedTimestamp))
-                                                                .ToArray();
+            // combine data, separator and timestamp (all are in bytes)
+            byte[] combined = Encoding.UTF8.GetBytes(encodedData)
+                .Concat(Encoding.UTF8.GetBytes(_sep))
+                .Concat(Encoding.UTF8.GetBytes(encodedTimestamp))
+                .ToArray();
 
-                                                byte[]    mac    =    HMACHelper.GetHMACDigest(DeriveKey(),    combined,    _hashAlgorithm);
-                                                string    signature    =    Base64Encode(mac);
-                                                string    dataString    =    encodedData    +    _sep    +    encodedTimestamp;
-                                                return    dataString    +    _sep    +    signature;
-                                }
+            byte[] mac = HMACHelper.GetHMACDigest(DeriveKey(), combined, _hashAlgorithm);
+            string signature = Base64Encode(mac);
+            string dataString = encodedData + _sep + encodedTimestamp;
+            return dataString + _sep + signature;
+        }
 
-                                public    override    string    Dumps(object    data)
-                                                =>    Dumps(data,    DateTimeOffset.UtcNow);
+        public override string Dumps(object data)
+            => Dumps(data, DateTimeOffset.UtcNow);
 
-                                protected    override    string    LoadsLogic(string    signedToken)
-                                {
+        protected override string LoadsLogic(string signedToken)
+        {
 
-                                                (string    encodedData,    string    encodedTimestamp,    byte[]    signature)    =    SplitTokenWithTimestamp(signedToken);
+            (string encodedData, string encodedTimestamp, byte[] signature) = SplitTokenWithTimestamp(signedToken);
 
-                                                byte[]    data    =    Encoding.UTF8.GetBytes(encodedData)
-                                                                .Concat(Encoding.UTF8.GetBytes(_sep))
-                                                                .Concat(Encoding.UTF8.GetBytes(encodedTimestamp))
-                                                                .ToArray();
-                                                var    mac    =    HMACHelper.GetHMACDigest(DeriveKey(),    data,    _hashAlgorithm);
-                                                if    (!HMACHelper.CompareDigest(mac,    signature))
-                                                                throw    new    BadTokenException("Data    has    been    tampered    or    signature    does    not    match");
+            byte[] data = Encoding.UTF8.GetBytes(encodedData)
+                .Concat(Encoding.UTF8.GetBytes(_sep))
+                .Concat(Encoding.UTF8.GetBytes(encodedTimestamp))
+                .ToArray();
+            var mac = HMACHelper.GetHMACDigest(DeriveKey(), data, _hashAlgorithm);
+            if (!HMACHelper.CompareDigest(mac, signature))
+                throw new BadTokenException("Data has been tampered or signature does not match");
 
-                                                long    timestamp    =    long.Parse(Encoding.UTF8.GetString(Base64Decode(encodedTimestamp)));
-                                                long    age    =    ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds()    -    timestamp;
-                                                if    (age    >=    _maxAge)
-                                                                throw    new    BadTokenException("Signature    has    expired");
+            long timestamp = long.Parse(Encoding.UTF8.GetString(Base64Decode(encodedTimestamp)));
+            long age = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - timestamp;
+            if (age >= _maxAge)
+                throw new BadTokenException("Signature has expired");
 
-                                                return    encodedData;
-                                }
-                }
+            return encodedData;
+        }
+    }
 }
