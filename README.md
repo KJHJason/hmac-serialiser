@@ -84,8 +84,8 @@ catch (BadTokenException)
 
 JsonDocument document = payload.jsonDocument;
 // or
-string name = payload.GetValue<string>("Name");
-int age = payload.GetValue<int>("Age");
+string name = payload.Get<string>("Name");
+int age = payload.Get<int>("Age");
 ```
 
 Signing and verifying a token with a string payload with 1 hour a time limit;
