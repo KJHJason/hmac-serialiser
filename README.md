@@ -34,7 +34,7 @@ Although it is not recommended to re-invent the wheel, I have added various test
 
 ## Sample Usage
 
-Mainly importing the following namespaces;
+Mainly importing the following namespaces:
 
 ```csharp
 using HMACSerialiser;
@@ -42,12 +42,32 @@ using HMACSerialiser.Errors;
 using static HMACSerialiser.HMAC.HMACHelper;
 ```
 
+Also, you can use the included base64 encoders:
+
+```csharp
+using HMACSerialiser.Base64Encoders;
+
+byte[] data = Encoding.UTF8.GetBytes("Hello, World!");
+
+string base64 = Base64Encoder.Base64Encode(data);
+byte[] decoded = Base64Encoder.Base64Decode(base64);
+string decodedString = Encoding.UTF8.GetString(decoded);
+
+Assert.Equal("Hello, World!", decodedString);
+
+string urlSafeBase64 = URLSafeBase64Encoder.Base64Encode(data);
+byte[] urlSafeDecoded = URLSafeBase64Encoder.Base64Decode(urlSafeBase64);
+string urlSafeDecodedString = Encoding.UTF8.GetString(urlSafeDecoded);
+
+Assert.Equal("Hello, World!", urlSafeDecodedString);
+```
+
 Signing and verifying a token with a JSON payload;
 
 ```csharp
 string key = "secret";
 string salt = "something-random";
-HMACHashFunction hashFunction = HMACHashFunction.SHA1;
+HMACHashAlgorithm hashFunction = HMACHashFunction.SHA1;
 
 var serialiser = new Serialiser(key, salt, hashFunction);
 object data = new { Name = "John Doe", Age = 25 };
@@ -73,7 +93,7 @@ Signing and verifying a token with a string payload with 1 hour a time limit;
 ```csharp
 string key = "secret";
 string salt = "something-random";
-HMACHashFunction hashFunction = HMACHashFunction.SHA256;
+HMACHashAlgorithm hashFunction = HMACHashFunction.SHA256;
 
 int maxAge = 3600; // 1 hour in seconds
 var serialiser = new TimedSerialiser(key, salt, maxAge, hashFunction);
@@ -97,7 +117,7 @@ Using a URLSafe serialiser to be used in URLs like JWT;
 string key = "secret";
 string salt = "something-random";
 string info = "unique-context-info";
-HMACHashFunction hashFunction = HMACHashFunction.SHA384;
+HMACHashAlgorithm hashFunction = HMACHashFunction.SHA384;
 
 var serialiser = new URLSafeSerialiser(key, salt, hashFunction, info);
 string data = "Note that this message can be still read by users by base64 decoding it!";
@@ -126,7 +146,7 @@ URLSafe Base64 Characters: `[A-Za-z0-9-_=]`
 string key = "secret";
 string salt = "something-random";
 int maxAge = 20; // 20 seconds
-HMACHashFunction hashFunction = HMACHashFunction.SHA512;
+HMACHashAlgorithm hashFunction = HMACHashFunction.SHA512;
 
 var serialiser = new TimedURLSafeSerialiser(key, salt, maxAge, hashFunction, sep: "!");
 string data = "nurture";
