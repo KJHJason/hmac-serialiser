@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HMACSerialiser.Errors
 {
-    // Custom exception class for bad signature
+    /// <summary>
+    /// Custom exception class for tampered or expired signature
+    /// </summary>
     public class BadTokenException : Exception
     {
         public BadTokenException() { }

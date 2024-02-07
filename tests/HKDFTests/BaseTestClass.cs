@@ -27,7 +27,7 @@ namespace HKDFTests
                     outputLen: len
                 );
                 string expected = expectedOutputs[idx++];
-                string actual = Base64Encoder.Base64Encode(okm);
+                string actual = Base64Encoder.Encode(okm);
                 Assert.AreEqual(expected, actual);
             }
         }

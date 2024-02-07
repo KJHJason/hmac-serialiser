@@ -64,6 +64,7 @@ namespace HMACSerialiser.KFD
         /// <param name="outputLen">The length to expand to in bytes.</param>
         /// <param name="salt">The salt value (a non-secret random value).</param>
         /// <param name="info">The context and application specific information (can be empty).</param>
+        /// <returns>The derived key in bytes.</returns>
         public static byte[] DeriveKey(HMACHashAlgorithm hashFunction, byte[] ikm, int outputLen, byte[] salt = null, byte[] info = null)
         {
             if (ikm == null || ikm.Length == 0)

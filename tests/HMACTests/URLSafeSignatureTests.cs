@@ -16,7 +16,7 @@ namespace HMACTests
             };
 
         private bool IsValidURL(string signedToken) 
-            => Uri.IsWellFormedUriString($"https://github.com/KJHJason/HMACSerialiser?token={signedToken}", UriKind.Absolute);
+            => Uri.TryCreate($"https://github.com/KJHJason/HMACSerialiser?token={signedToken}", UriKind.Absolute, out _);
 
         [TestMethod]
         public void URLSafeTokens()

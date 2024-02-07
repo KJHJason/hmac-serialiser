@@ -42,36 +42,16 @@ using HMACSerialiser.Errors;
 using static HMACSerialiser.HMAC.HMACHelper;
 ```
 
-Also, you can use the included base64 encoders:
-
-```csharp
-using HMACSerialiser.Base64Encoders;
-
-byte[] data = Encoding.UTF8.GetBytes("Hello, World!");
-
-string base64 = Base64Encoder.Base64Encode(data);
-byte[] decoded = Base64Encoder.Base64Decode(base64);
-string decodedString = Encoding.UTF8.GetString(decoded);
-
-Assert.Equal("Hello, World!", decodedString);
-
-string urlSafeBase64 = URLSafeBase64Encoder.Base64Encode(data);
-byte[] urlSafeDecoded = URLSafeBase64Encoder.Base64Decode(urlSafeBase64);
-string urlSafeDecodedString = Encoding.UTF8.GetString(urlSafeDecoded);
-
-Assert.Equal("Hello, World!", urlSafeDecodedString);
-```
-
 Signing and verifying a token with a JSON payload;
 
 ```csharp
 string key = "secret";
 string salt = "something-random";
-HMACHashAlgorithm hashFunction = HMACHashFunction.SHA1;
+HMACHashAlgorithm hashFunction = HMACHashAlgorithm.SHA1;
 
 var serialiser = new Serialiser(key, salt, hashFunction);
 object data = new { Name = "John Doe", Age = 25 };
-string token = serialiser.Dumps(data);
+string token = serialiser.Dumps(data); // eyJOYW1lIjoiSm9obiBEb2UiLCJBZ2UiOjI1fQ.m4km5yvsgL1V3fzPrEg/Ay9eX0c
 
 try 
 {
@@ -93,12 +73,12 @@ Signing and verifying a token with a string payload with 1 hour a time limit;
 ```csharp
 string key = "secret";
 string salt = "something-random";
-HMACHashAlgorithm hashFunction = HMACHashFunction.SHA256;
+HMACHashAlgorithm hashFunction = HMACHashAlgorithm.SHA256;
 
 int maxAge = 3600; // 1 hour in seconds
 var serialiser = new TimedSerialiser(key, salt, maxAge, hashFunction);
 string data = "Message that should not tampered with!";
-string token = serialiser.Dumps(data);
+string token = serialiser.Dumps(data); // TWVzc2FnZSB0aGF0IHNob3VsZCBub3QgdGFtcGVyZWQgd2l0aCE.MTcwNzI3OTk4Nw.dTOD5GbC/V46IAKKMpIFJQF7kG+7wKjq3aoZWbB9cDE
 
 try 
 {
@@ -117,11 +97,11 @@ Using a URLSafe serialiser to be used in URLs like JWT;
 string key = "secret";
 string salt = "something-random";
 string info = "unique-context-info";
-HMACHashAlgorithm hashFunction = HMACHashFunction.SHA384;
+HMACHashAlgorithm hashFunction = HMACHashAlgorithm.SHA384;
 
 var serialiser = new URLSafeSerialiser(key, salt, hashFunction, info);
 string data = "Note that this message can be still read by users by base64 decoding it!";
-string token = serialiser.Dumps(data);
+string token = serialiser.Dumps(data); // Tm90ZSB0aGF0IHRoaXMgbWVzc2FnZSBjYW4gYmUgc3RpbGwgcmVhZCBieSB1c2VycyBieSBiYXNlNjQgZGVjb2RpbmcgaXQh.zNYNQ2Uq3OayBPRn6ItYRUzSmCmb5vHbTAfgJPK9GzEHxdrFQen5yLR2HZo7q-Kn
 
 try 
 {
@@ -134,7 +114,7 @@ catch (BadTokenException)
 }
 ```
 
-Want to change the default separator of `.` used in the serialised token? You can do so by setting the `sep` parameter in the constructor;
+Although it is not recommended to change the default separator of `.` used in the serialised token unless you know what you are doing, you can do so by setting the sep parameter in the constructor.
 
 However, the separator should not be a character that is used in the base64 encoding of the payload and the HMAC signature.
 
@@ -142,15 +122,17 @@ Base64 Characters: `[A-Za-z0-9+/=]`
 
 URLSafe Base64 Characters: `[A-Za-z0-9-_=]`
 
+Though for URLSafe tokens, the separator should be a character that can be safely used in URLs to prevent unexpected behaviour like using `?` as the separator as it used to separate the query string from the URL.
+
 ```csharp
 string key = "secret";
 string salt = "something-random";
 int maxAge = 20; // 20 seconds
-HMACHashAlgorithm hashFunction = HMACHashFunction.SHA512;
+HMACHashAlgorithm hashFunction = HMACHashAlgorithm.SHA512;
 
 var serialiser = new TimedURLSafeSerialiser(key, salt, maxAge, hashFunction, sep: "!");
 string data = "nurture";
-string token = serialiser.Dumps(data);
+string token = serialiser.Dumps(data); // bnVydHVyZQ!MTcwNzI4MDA0Mw!8StFXyv9pg6mwvCU7-gef3tgs-QyqeSbZRipryKu7PUyG3DNOhsyjVDKcH3-kFCEvDpQI4DxSleOsm9mV4VW9w
 
 try 
 {
@@ -161,4 +143,24 @@ catch (BadTokenException)
 {
     // Handle bad token
 }
+```
+
+Also, you can use the included base64 encoders:
+
+However, in my implementation, I have removed the padding `=` from the base64 encoded string to slightly reduce the length of the token.
+
+```csharp
+using HMACSerialiser.Base64Encoders;
+
+string data = "~~~https://github.com/KJHJason/HMACSerialiser~~~";
+
+string base64Data = Base64Encoder.Encode(data);
+Assert.Equal("fn5+aHR0cHM6Ly9naXRodWIuY29tL0tKSEphc29uL0hNQUNTZXJpYWxpc2Vyfn5+", base64Data);
+string decodedString = Base64Encoder.DecodeToString(base64);
+Assert.Equal("~~~https://github.com/KJHJason/HMACSerialiser~~~", decodedString);
+
+string urlSafeBase64Data = URLSafeBase64Encoder.Encode(data);
+Assert.Equal("fn5-aHR0cHM6Ly9naXRodWIuY29tL0tKSEphc29uL0hNQUNTZXJpYWxpc2Vyfn5-", urlSafeDecodedString);
+string urlSafeDecodedString = URLSafeBase64Encoder.DecodeToString(urlSafeBase64Data);
+Assert.Equal("~~~https://github.com/KJHJason/HMACSerialiser~~~", urlSafeBase64Data);
 ```

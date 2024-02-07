@@ -17,12 +17,12 @@ namespace HMACTests
         private const string _data = "KJHJason/HMACSerialiser";
         private static readonly DateTimeOffset _dateTime = new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero); // 1706745600 (Unix time)
 
-        private static readonly string encodedData = Convert.ToBase64String(Encoding.UTF8.GetBytes(_data));
-        private static readonly string urlsafeEncodedData = URLSafeBase64Encoder.Base64Encode(Encoding.UTF8.GetBytes(_data));
+        private static readonly string encodedData = Base64Encoder.Encode(_data);
+        private static readonly string urlsafeEncodedData = URLSafeBase64Encoder.Encode(_data);
 
-        private static readonly byte[] timestampBytes = Encoding.UTF8.GetBytes(_dateTime.ToUnixTimeSeconds().ToString());
-        private static readonly string encodedUnixTime = Convert.ToBase64String(timestampBytes);
-        private static readonly string urlsafeEncodedUnixTime = URLSafeBase64Encoder.Base64Encode(timestampBytes);
+        private static readonly string timestamp = _dateTime.ToUnixTimeSeconds().ToString();
+        private static readonly string encodedUnixTime = Base64Encoder.Encode(timestamp);
+        private static readonly string urlsafeEncodedUnixTime = URLSafeBase64Encoder.Encode(timestamp);
 
         protected override ISerialiser[] InitialiseAllSerialisers(object key, object salt, HMACHashAlgorithm hashFunction, object info, int maxAge) 
             => new ISerialiser[] 
@@ -64,8 +64,8 @@ namespace HMACTests
             // [Serialiser, URLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.Xz4h5lldXM2j6ZFo6VuGGA0B5+I=",
-                $"{urlsafeEncodedData}.Xz4h5lldXM2j6ZFo6VuGGA0B5-I=",
+                $"{encodedData}.o4Bln1A17yxv6uY8Jf7BUKZceeg",
+                $"{urlsafeEncodedData}.o4Bln1A17yxv6uY8Jf7BUKZceeg",
             };
             TestsOutputs(serialisers, expected);
         }
@@ -79,8 +79,8 @@ namespace HMACTests
             // [TimedSerialiser, TimedURLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.{encodedUnixTime}.tEy7zeJ97QbUGPFRlOhSs+lwvBE=",
-                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.tEy7zeJ97QbUGPFRlOhSs-lwvBE=",
+                $"{encodedData}.{encodedUnixTime}.myC2PU9USJhV52Sm0xoqmdi/dWo",
+                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.myC2PU9USJhV52Sm0xoqmdi_dWo",
             };
             TestsOutputs(serialisers, expected);
         }
@@ -100,8 +100,8 @@ namespace HMACTests
             // [Serialiser, URLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.RXqJxlU3oAbDve2Mknw2HYblpFhjxnopK6IEdCFeUqs=",
-                $"{urlsafeEncodedData}.RXqJxlU3oAbDve2Mknw2HYblpFhjxnopK6IEdCFeUqs=",
+                $"{encodedData}.PQERg33/tFni59L421IH7mLje0QUZIpfWwwK2nGBjS8",
+                $"{urlsafeEncodedData}.PQERg33_tFni59L421IH7mLje0QUZIpfWwwK2nGBjS8",
             };
             TestsOutputs(serialisers, expected);
         }
@@ -115,8 +115,8 @@ namespace HMACTests
             // [TimedSerialiser, TimedURLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.{encodedUnixTime}.eLOxS2h4C5aeudi6DNc9N53LFvN3KCZrtbF0tIk0/y8=",
-                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.eLOxS2h4C5aeudi6DNc9N53LFvN3KCZrtbF0tIk0_y8=",
+                $"{encodedData}.{encodedUnixTime}.LhAOIwiAo130GPK0xz1Z/2N/Ztru/AgfyBRlyCRRdBE",
+                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.LhAOIwiAo130GPK0xz1Z_2N_Ztru_AgfyBRlyCRRdBE",
             };
             TestsOutputs(serialisers, expected);
         }
@@ -136,8 +136,8 @@ namespace HMACTests
             // [Serialiser, URLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.9w4JAhHckAI3I8fKy0L9Bq+3RYxtrvk4KelxWIsv6MuaVpEJsaQ4sWxyvNkiaXPQ",
-                $"{urlsafeEncodedData}.9w4JAhHckAI3I8fKy0L9Bq-3RYxtrvk4KelxWIsv6MuaVpEJsaQ4sWxyvNkiaXPQ",
+                $"{encodedData}.kMdnRpYh6JmSSTIlIxqM0cwph+uaMK/GdhfAINkA/y0dw/I/7EdDiR5qft6ykMbb",
+                $"{urlsafeEncodedData}.kMdnRpYh6JmSSTIlIxqM0cwph-uaMK_GdhfAINkA_y0dw_I_7EdDiR5qft6ykMbb",
             };
             TestsOutputs(serialisers, expected);
         }
@@ -151,8 +151,8 @@ namespace HMACTests
             // [TimedSerialiser, TimedURLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.{encodedUnixTime}.l50UItfiTIHxr0WrzXEMPwe0LMZqO3pFSOfFu3c369xJds34cTLhi7w+pXQ04x+f",
-                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.l50UItfiTIHxr0WrzXEMPwe0LMZqO3pFSOfFu3c369xJds34cTLhi7w-pXQ04x-f",
+                $"{encodedData}.{encodedUnixTime}.UkXLRk6qgDIpFG5ZPcvf/93nrqSCwHiSk83t4S1oZ4/M71VnIryhZKJPEOBKybI6",
+                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.UkXLRk6qgDIpFG5ZPcvf_93nrqSCwHiSk83t4S1oZ4_M71VnIryhZKJPEOBKybI6",
             };
             TestsOutputs(serialisers, expected);
         }
@@ -172,8 +172,8 @@ namespace HMACTests
             // [Serialiser, URLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.wifr1DwcDlp0q3wUCErD2uKh37+T7BRvomIjD23c7KWJXa0sfF0X3daokxvuY2LDNtISvwRTj5cZxWE1tA4JJw==",
-                $"{urlsafeEncodedData}.wifr1DwcDlp0q3wUCErD2uKh37-T7BRvomIjD23c7KWJXa0sfF0X3daokxvuY2LDNtISvwRTj5cZxWE1tA4JJw==",
+                $"{encodedData}.cb6m0rDv1im8RPOo8QrNOxxOs2EQpM6FlseR2FPD2J+Zi0lOcBn5nLcwVj7NgLrnAsG/f3kfqYIl7XPYS6zEpw",
+                $"{urlsafeEncodedData}.cb6m0rDv1im8RPOo8QrNOxxOs2EQpM6FlseR2FPD2J-Zi0lOcBn5nLcwVj7NgLrnAsG_f3kfqYIl7XPYS6zEpw",
             };
             TestsOutputs(serialisers, expected);
         }
@@ -187,8 +187,8 @@ namespace HMACTests
             // [TimedSerialiser, TimedURLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.{encodedUnixTime}.kXtK/hFtErgVRpsPuLuuOt4rOLuuAdsOJVgsGMOKcAYQjWh6dhdyklw+DPRJJ/2Zx1LK8mstAW2/HMTH4PZHPA==",
-                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.kXtK_hFtErgVRpsPuLuuOt4rOLuuAdsOJVgsGMOKcAYQjWh6dhdyklw-DPRJJ_2Zx1LK8mstAW2_HMTH4PZHPA==",
+                $"{encodedData}.{encodedUnixTime}.RFxkZ5sKdaJkOnq3z4H365xoB2pZB0CVEl75L/4mat5BD17mbIM8sf4Kof2feuzIbU8TKOfk3QpTVaQ33Hvnyg",
+                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.RFxkZ5sKdaJkOnq3z4H365xoB2pZB0CVEl75L_4mat5BD17mbIM8sf4Kof2feuzIbU8TKOfk3QpTVaQ33Hvnyg",
             };
             TestsOutputs(serialisers, expected);
         }

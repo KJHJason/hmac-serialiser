@@ -20,13 +20,13 @@ namespace HKDFTests
             var expectedOutputs = new string[] 
             {
                 // SHA1
-                "HJUtmQOEoizG55j5NaciQiWj7l+L2iO4t53dLl0OcNHomNdulCKsVKvWeR9sGHutJfzi2noxOb8PV4NxbflJQA==",
+                "HJUtmQOEoizG55j5NaciQiWj7l+L2iO4t53dLl0OcNHomNdulCKsVKvWeR9sGHutJfzi2noxOb8PV4NxbflJQA",
                 // SHA256
-                "Wke0fZDymADHJihbD5Du8uHqo/tEvxgbBUXsbKPLqfwhcKg6oxjb59Tgg9EOXLX72HSRr1fjrn+M70Knc2l22A==",
+                "Wke0fZDymADHJihbD5Du8uHqo/tEvxgbBUXsbKPLqfwhcKg6oxjb59Tgg9EOXLX72HSRr1fjrn+M70Knc2l22A",
                 // SHA384
-                "rR04Dv5DmXrBdqwp5TUlFX3bVAwnFtUjyMjp62Yg38cU1IFJOOyqyRQjVAUamuApM0rPg4S5bg7HHDT9GP0eag==",
+                "rR04Dv5DmXrBdqwp5TUlFX3bVAwnFtUjyMjp62Yg38cU1IFJOOyqyRQjVAUamuApM0rPg4S5bg7HHDT9GP0eag",
                 // SHA512
-                "xKCFxM9b4esbu6gXE+r548nC97Np0CqGLTbxtm2NSav01rzYBm90oO+Pd6UZLuO86IAZdF/+cDQgsmKvM2EhDQ==",
+                "xKCFxM9b4esbu6gXE+r548nC97Np0CqGLTbxtm2NSav01rzYBm90oO+Pd6UZLuO86IAZdF/+cDQgsmKvM2EhDQ",
             };
             TestOutputs(ikm, salt, info, len, expectedOutputs);
         }
@@ -41,13 +41,13 @@ namespace HKDFTests
             var expectedOutputs = new string[] 
             {
                 // SHA1
-                "iwfbEhqEtz7vZee8pu5zkqo18X/Nfc9ZKHnxbxRhREDjaImmItCHPynQ27O4t7q2hsrZbsLcPDTLOtQ99bQjPw==",
+                "iwfbEhqEtz7vZee8pu5zkqo18X/Nfc9ZKHnxbxRhREDjaImmItCHPynQ27O4t7q2hsrZbsLcPDTLOtQ99bQjPw",
                 // SHA256
-                "QLpQxBIqFzsowou5i4tlxZaU79i/TgcN6Bu2oNzr3NG14HVZh0+UOHim9Tg0hz+cZEsP+btgF2EEpUy3uWsDkg==",
+                "QLpQxBIqFzsowou5i4tlxZaU79i/TgcN6Bu2oNzr3NG14HVZh0+UOHim9Tg0hz+cZEsP+btgF2EEpUy3uWsDkg",
                 // SHA384
-                "M/CJlBKOqE5/o6zz4IqBH3Bwer7W7u/HM/4kSaTRA7zEDoZe0P3JguiKa0hvoorVmHWvltWOJeoQCB32wkE6Og==",
+                "M/CJlBKOqE5/o6zz4IqBH3Bwer7W7u/HM/4kSaTRA7zEDoZe0P3JguiKa0hvoorVmHWvltWOJeoQCB32wkE6Og",
                 // SHA512
-                "HKdFaD+Ay1EMYdfzHcSe77VJmUiqctt5MS4yRoSWVM4CIEVC1wr5ps/EyV3gwrfG//Jk4Hr+IXQr+gj4KeTS5Q==",
+                "HKdFaD+Ay1EMYdfzHcSe77VJmUiqctt5MS4yRoSWVM4CIEVC1wr5ps/EyV3gwrfG//Jk4Hr+IXQr+gj4KeTS5Q",
             };
             TestOutputs(ikm, salt, info, len, expectedOutputs);
         }
@@ -62,13 +62,13 @@ namespace HKDFTests
             var expectedOutputs = new string[] 
             {
                 // SHA1
-                "aJYd6yAvMhgbDclGEPlLOTGIumNOta2XIoHcWfGhZX35kr9k10lCSSq9kMBeHm6aXjAOGfBBxlAwUcNcSzwyzQ==",
+                "aJYd6yAvMhgbDclGEPlLOTGIumNOta2XIoHcWfGhZX35kr9k10lCSSq9kMBeHm6aXjAOGfBBxlAwUcNcSzwyzQ",
                 // SHA256
-                "RqtixLu98vE947awOHKfZbxGg5q491pvBJChwNlEGGNukqv4J8NnCf8vntK6AfK3wx6c26S317B9xYLnY2sHrg==",
+                "RqtixLu98vE947awOHKfZbxGg5q491pvBJChwNlEGGNukqv4J8NnCf8vntK6AfK3wx6c26S317B9xYLnY2sHrg",
                 // SHA384
-                "g6PmQvmIIaGFHji1RqhXu77u7MFFjkc5wRpXe75TKB6Cuh94Qwek6DFe8yZmjPuu3NsOVaM/MX2a/rzZgh5buw==",
+                "g6PmQvmIIaGFHji1RqhXu77u7MFFjkc5wRpXe75TKB6Cuh94Qwek6DFe8yZmjPuu3NsOVaM/MX2a/rzZgh5buw",
                 // SHA512
-                "Bsp5WAe8I8cR/sDGVCWPReDH4HvaQmTZmKIH7rhBYjRAgx5oR+ueLWhc4LUnGjKojM8KyGiUmwmZ1JdxG5SV/A==",
+                "Bsp5WAe8I8cR/sDGVCWPReDH4HvaQmTZmKIH7rhBYjRAgx5oR+ueLWhc4LUnGjKojM8KyGiUmwmZ1JdxG5SV/A",
             };
             TestOutputs(ikm, salt, info, len, expectedOutputs);
         }
@@ -83,13 +83,13 @@ namespace HKDFTests
             var expectedOutputs = new string[] 
             {
                 // SHA1
-                "o6JPotQcpje9N97TSakx4uQDj6mM9uk9NvyTyp5nHj8RpDDjctqpYvYaxuaT0S2WI0b99uKt/3+jzgY9K2BQpA==",
+                "o6JPotQcpje9N97TSakx4uQDj6mM9uk9NvyTyp5nHj8RpDDjctqpYvYaxuaT0S2WI0b99uKt/3+jzgY9K2BQpA",
                 // SHA256
-                "O1sVsHjMcBF1Rb1Ct/HmMmi1RYwfKA5rSEb3V7OMpHfmh9y+pL3yGRRGBaL09patmYmv6r9bE++TlOE3/uEQRQ==",
+                "O1sVsHjMcBF1Rb1Ct/HmMmi1RYwfKA5rSEb3V7OMpHfmh9y+pL3yGRRGBaL09patmYmv6r9bE++TlOE3/uEQRQ",
                 // SHA384
-                "sh9nBvK9v3Xl9Wv0Wa0CGMISXY081Ql0polu9wLyMnSeEomUv7utlDaKHI7GFlzZ23D3VHrnOr1/rH7eim8oDA==",
+                "sh9nBvK9v3Xl9Wv0Wa0CGMISXY081Ql0polu9wLyMnSeEomUv7utlDaKHI7GFlzZ23D3VHrnOr1/rH7eim8oDA",
                 // SHA512
-                "03exFA5mRAjfHc63izMncu1ved8KMbEe70/F2A9akYBFTEs72c6rP+ukz1DoZYUltP9vi9cwOkdlRvzhJNP71w==",
+                "03exFA5mRAjfHc63izMncu1ved8KMbEe70/F2A9akYBFTEs72c6rP+ukz1DoZYUltP9vi9cwOkdlRvzhJNP71w",
             };
             TestOutputs(ikm, salt, info, len, expectedOutputs);
         }

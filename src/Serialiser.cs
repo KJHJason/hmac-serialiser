@@ -17,6 +17,14 @@ namespace HMACSerialiser
         protected readonly byte[] _info;
         protected readonly HMACHelper.HMACHashAlgorithm _hashAlgorithm;
 
+        /// <summary>
+        /// Initialises a new instance of the Serialiser class to cryptographically sign and verify data.
+        /// </summary>
+        /// <param name="key">The secret key to use</param>
+        /// <param name="salt">The salt to use</param>
+        /// <param name="hashAlgorithm">The HMAC hash function to use</param>
+        /// <param name="info">The context and application specific information (can be empty).</param>
+        /// <param name="sep">The separator to use. However, it must not contain any base64 characters.</param>
         public Serialiser(
             object key, 
             object salt, 
@@ -57,10 +65,16 @@ namespace HMACSerialiser
         }
 
         protected virtual string Base64Encode(byte[] data)
-            => Base64Encoder.Base64Encode(data);
+            => Base64Encoder.Encode(data);
+
+        protected virtual string Base64Encode(string data)
+            => Base64Encoder.Encode(data);
 
         protected virtual byte[] Base64Decode(string data)
-            => Base64Encoder.Base64Decode(data);
+            => Base64Encoder.Decode(data);
+
+        protected virtual string Base64DecodeToString(string data)
+            => Base64Encoder.DecodeToString(data);
 
         protected virtual bool CheckSepIsValidLogic()
             => Base64Encoder.ContainsBase64Chars(_sep);
@@ -85,31 +99,17 @@ namespace HMACSerialiser
         protected JSONPayload DeserialiseObject(string encodedData)
             => new JSONPayload(JsonDocument.Parse(DeserialiseString(encodedData)));
 
-        protected string CombineData(params byte[][] data)
-        {
-            if (data.Length == 1)
-                return Base64Encode(data[0]);
-
-            var combined = new StringBuilder();
-            foreach (var item in data)
-            {
-                combined.Append(Base64Encode(item));
-                combined.Append(_sep);
-            }
-
-            if (combined.Length > 0)
-                // Remove the last separator
-                combined.Remove(combined.Length - _sep.Length, _sep.Length);
-
-            return combined.ToString();
-        }
-
+        /// <summary>
+        /// Dumps the provided payload into a base64 encoded string and signs it.
+        /// </summary>
+        /// <param name="data">The payload to sign</param>
+        /// <returns>The serialised token</returns>
         public virtual string Dumps(object data)
         {
             byte[] serialisedData = SerialiseObject(data);
             string dataToSign = Base64Encode(serialisedData);
 
-            byte[] mac = HMACHelper.GetHMACDigest(DeriveKey(), Encoding.UTF8.GetBytes(dataToSign), _hashAlgorithm);
+            byte[] mac = HMACHelper.GetHMACDigest(DeriveKey(), dataToSign, _hashAlgorithm);
             string signature = Base64Encode(mac);
             return dataToSign + _sep + signature;
         }
@@ -139,18 +139,28 @@ namespace HMACSerialiser
         protected virtual string LoadsLogic(string signedToken)
         {
             (string encodedData, byte[] signature) = SplitToken(signedToken);
-            byte[] mac = HMACHelper.GetHMACDigest(DeriveKey(), Encoding.UTF8.GetBytes(encodedData), _hashAlgorithm);
+            byte[] mac = HMACHelper.GetHMACDigest(DeriveKey(), encodedData, _hashAlgorithm);
             if (!HMACHelper.CompareDigest(mac, signature))
                 throw new BadTokenException("Data has been tampered or signature does not match");
             return encodedData;
         }
 
+        /// <summary>
+        /// Verifies and loads the payload from the signed token.
+        /// </summary>
+        /// <param name="signedToken">The signed token to verify</param>
+        /// <returns>The original string payload from the signed token</returns>
         public string LoadsString(string signedToken)
         {
             string encodedData = LoadsLogic(signedToken);
             return DeserialiseString(encodedData);
         }
 
+        /// <summary>
+        /// Verifies and loads the JSON payload from the signed token.
+        /// </summary>
+        /// <param name="signedToken">The signed token to verify</param>
+        /// <returns>The original JSON object from the signed token</returns>
         public JSONPayload Loads(string signedToken)
         {
             string encodedData = LoadsLogic(signedToken);

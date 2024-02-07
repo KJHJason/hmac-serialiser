@@ -17,7 +17,7 @@ namespace HMACSerialiser.HMAC
             SHA512
         }
 
-        public static int GetHashSize(HMACHashAlgorithm hashAlgorithm)
+        internal static int GetHashSize(HMACHashAlgorithm hashAlgorithm)
         {
             switch (hashAlgorithm)
             {
@@ -34,7 +34,7 @@ namespace HMACSerialiser.HMAC
             }
         }
 
-        public static int GetHashSizeInBytes(HMACHashAlgorithm hashAlgorithm)
+        internal static int GetHashSizeInBytes(HMACHashAlgorithm hashAlgorithm)
         {
             switch (hashAlgorithm)
             {
@@ -52,7 +52,7 @@ namespace HMACSerialiser.HMAC
         }
 
         // Mainly to expand the key to the corresponding block size of the hash algorithm
-        public static int GetLengthForHKDF(HMACHashAlgorithm hashAlgorithm)
+        internal static int GetLengthForHKDF(HMACHashAlgorithm hashAlgorithm)
         {
             switch (hashAlgorithm)
             {
@@ -69,7 +69,7 @@ namespace HMACSerialiser.HMAC
             }
         }
 
-        public static byte[] ConvertToBytes(object value)
+        internal static byte[] ConvertToBytes(object value)
         {
             if (value == null)
                 return null;
@@ -83,7 +83,7 @@ namespace HMACSerialiser.HMAC
             throw new ArgumentException("Unsupported type for key or salt");
         }
 
-        public static byte[] GetHMACDigest(byte[] key, byte[] data, HMACHashAlgorithm hashAlgorithm = HMACHashAlgorithm.SHA1)
+        internal static byte[] GetHMACDigest(byte[] key, byte[] data, HMACHashAlgorithm hashAlgorithm = HMACHashAlgorithm.SHA1)
         {
             using (KeyedHashAlgorithm hmac = GetHMACInstance(hashAlgorithm, key))
             {
@@ -91,6 +91,9 @@ namespace HMACSerialiser.HMAC
                 return hashBytes;
             }
         }
+
+        internal static byte[] GetHMACDigest(byte[] key, string data, HMACHashAlgorithm hashAlgorithm = HMACHashAlgorithm.SHA1)
+            => GetHMACDigest(key, Encoding.UTF8.GetBytes(data), hashAlgorithm);
 
         internal static KeyedHashAlgorithm GetHMACInstance(HMACHashAlgorithm hashAlgorithm, byte[] key)
         {
@@ -109,7 +112,7 @@ namespace HMACSerialiser.HMAC
             }
         }
 
-        public static bool CompareDigest(byte[] mac1, byte[] mac2)
+        internal static bool CompareDigest(byte[] mac1, byte[] mac2)
         {
             if (mac1 == null || mac2 == null)
                 return false;
