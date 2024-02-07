@@ -7,7 +7,7 @@
     <Company />
     <Authors>KJHJason</Authors>
     <Description>HMAC Serialisers to cryptographically sign data like Python's ItsDangerous library.</Description>
-    <Copyright>MIT license</Copyright>
+    <Copyright>Copyright © 2024, KJHJason</Copyright>
     <BaseOutputPath>C:\Nuget</BaseOutputPath>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
