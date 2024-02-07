@@ -33,7 +33,7 @@ namespace HMACSerialiser
 
         protected (string data, string timestamp, byte[] signature) SplitTokenWithTimestamp(string signedToken)
         {
-            var split = signedToken.Split(_sep);
+            var split = signedToken.Split(new string[] { _sep }, StringSplitOptions.None);
             if (split.Length != 3)
                 throw new BadTokenException("Invalid token format");
 

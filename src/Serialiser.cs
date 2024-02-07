@@ -116,7 +116,7 @@ namespace HMACSerialiser
 
         protected (string data, byte[] signature) SplitToken(string signedToken)
         {
-            var split = signedToken.Split(_sep);
+            var split = signedToken.Split(new string[] { _sep }, StringSplitOptions.None);
             if (split.Length != 2)
                 throw new BadTokenException("Invalid token format");
 

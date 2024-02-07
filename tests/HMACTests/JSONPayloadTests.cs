@@ -17,12 +17,12 @@ namespace HMACTests
             DateTime created = DateTime.Now;
             double wallet = 10.00;
             bool verified = true;
-            List<string> sessions = new List<string> 
+            List<string> sessions = new List<string>
             {
                 "session1",
                 "session2"
             };
-            var family = new Dictionary<string, string> 
+            var family = new Dictionary<string, string>
             {
                 { "father", "John"},
                 { "mother", "Jane" },
@@ -81,6 +81,39 @@ namespace HMACTests
 
                     Dictionary<string, string> actualFamily = result.Get<Dictionary<string, string>>("family");
                     CollectionAssert.AreEqual(family, actualFamily);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void JsonArrayPayload()
+        {
+            var data = new List<string>
+            {
+                "item1",
+                "item2",
+                "item3",
+            };
+
+            var serialisers = GetAllSerialisers();
+            foreach (var serialiserByHashFunc in serialisers.GetList())
+            {
+                foreach (var serialiser in serialiserByHashFunc)
+                {
+                    JSONPayload result;
+                    try
+                    {
+                        string signed = serialiser.Dumps(data);
+                        result = serialiser.Loads(signed);
+                    }
+                    catch (Exception e)
+                    {
+                        Assert.Fail($"Unexpected exception: {e.Message}");
+                        return;
+                    }
+
+                    List<string> actualData = result.Get<List<string>>();
+                    CollectionAssert.AreEqual(data, actualData);
                 }
             }
         }
