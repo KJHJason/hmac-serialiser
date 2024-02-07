@@ -19,10 +19,14 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 3.0.x
     - name: Restore dependencies
       run: dotnet restore ./src/HMACSerialiser.csproj
     - name: Build
       run: dotnet build --no-restore ./src/HMACSerialiser.csproj
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - name: Test HMAC
+      run: dotnet test --no-build --verbosity normal ./tests/HMACTests/HMACTests.csproj
+    - name: Test HKDF
+      run: dotnet test --no-build --verbosity normal ./tests/HKDFTests/HKDFTests.csproj
+    - name: Test Base64 Encoders
+      run: dotnet test --no-build --verbosity normal ./tests/Base64EncoderTests/Base64EncoderTests.csproj
