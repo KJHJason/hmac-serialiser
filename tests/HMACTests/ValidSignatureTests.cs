@@ -1,9 +1,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using HMACSerialiser.Base64Encoders;
+using System.IO;
 using System.Text;
-using static HMACSerialiser.HMAC.HMACHelper;
+using System.Text.Json;
+using System.Collections.Generic;
 using HMACSerialiser;
+using static HMACSerialiser.HMAC.HMACHelper;
 
 namespace HMACTests
 {
@@ -17,12 +19,31 @@ namespace HMACTests
         private const string _data = "KJHJason/HMACSerialiser";
         private static readonly DateTimeOffset _dateTime = new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero); // 1706745600 (Unix time)
 
-        private static readonly string encodedData = Base64Encoder.Encode(_data);
-        private static readonly string urlsafeEncodedData = URLSafeBase64Encoder.Encode(_data);
+        private readonly JSONPayload _json;
+        private const string serialiser = "serialiser";
+        private const string urlsafeSerialiser = "urlsafe-serialiser";
+        private const string timedSerialiser = "timed-serialiser";
+        private const string timedUrlsafeSerialiser = "timed-urlsafe-serialiser";
+        private const string sha1 = "sha1";
+        private const string sha256 = "sha256";
+        private const string sha384 = "sha384";
+        private const string sha512 = "sha512";
 
-        private static readonly string timestamp = _dateTime.ToUnixTimeSeconds().ToString();
-        private static readonly string encodedUnixTime = Base64Encoder.Encode(timestamp);
-        private static readonly string urlsafeEncodedUnixTime = URLSafeBase64Encoder.Encode(timestamp);
+        public ValidSignatureTests()
+        {
+            string hmacReferencePyOutput = "{\"sha1\": {\"serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.o4Bln1A17yxv6uY8Jf7BUKZceeg\", \"urlsafe-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.o4Bln1A17yxv6uY8Jf7BUKZceeg\", \"timed-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.MTcwNjc0NTYwMA.myC2PU9USJhV52Sm0xoqmdi/dWo\", \"timed-urlsafe-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.MTcwNjc0NTYwMA.myC2PU9USJhV52Sm0xoqmdi_dWo\"}, \"sha256\": {\"serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.PQERg33/tFni59L421IH7mLje0QUZIpfWwwK2nGBjS8\", \"urlsafe-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.PQERg33_tFni59L421IH7mLje0QUZIpfWwwK2nGBjS8\", \"timed-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.MTcwNjc0NTYwMA.LhAOIwiAo130GPK0xz1Z/2N/Ztru/AgfyBRlyCRRdBE\", \"timed-urlsafe-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.MTcwNjc0NTYwMA.LhAOIwiAo130GPK0xz1Z_2N_Ztru_AgfyBRlyCRRdBE\"}, \"sha384\": {\"serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.kMdnRpYh6JmSSTIlIxqM0cwph+uaMK/GdhfAINkA/y0dw/I/7EdDiR5qft6ykMbb\", \"urlsafe-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.kMdnRpYh6JmSSTIlIxqM0cwph-uaMK_GdhfAINkA_y0dw_I_7EdDiR5qft6ykMbb\", \"timed-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.MTcwNjc0NTYwMA.UkXLRk6qgDIpFG5ZPcvf/93nrqSCwHiSk83t4S1oZ4/M71VnIryhZKJPEOBKybI6\", \"timed-urlsafe-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.MTcwNjc0NTYwMA.UkXLRk6qgDIpFG5ZPcvf_93nrqSCwHiSk83t4S1oZ4_M71VnIryhZKJPEOBKybI6\"}, \"sha512\": {\"serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.cb6m0rDv1im8RPOo8QrNOxxOs2EQpM6FlseR2FPD2J+Zi0lOcBn5nLcwVj7NgLrnAsG/f3kfqYIl7XPYS6zEpw\", \"urlsafe-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.cb6m0rDv1im8RPOo8QrNOxxOs2EQpM6FlseR2FPD2J-Zi0lOcBn5nLcwVj7NgLrnAsG_f3kfqYIl7XPYS6zEpw\", \"timed-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.MTcwNjc0NTYwMA.RFxkZ5sKdaJkOnq3z4H365xoB2pZB0CVEl75L/4mat5BD17mbIM8sf4Kof2feuzIbU8TKOfk3QpTVaQ33Hvnyg\", \"timed-urlsafe-serialiser\": \"S0pISmFzb24vSE1BQ1NlcmlhbGlzZXI.MTcwNjc0NTYwMA.RFxkZ5sKdaJkOnq3z4H365xoB2pZB0CVEl75L_4mat5BD17mbIM8sf4Kof2feuzIbU8TKOfk3QpTVaQ33Hvnyg\"}}";
+            using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(hmacReferencePyOutput)))
+            {
+                _json = new JSONPayload(JsonDocument.Parse(ms));
+            }
+        }
+
+        private string GetExpected(string hashFunction, string serialiser)
+        {
+            // sample data: { "sha1" : { "serialiser" : "data.signature" } }
+            var hashFunc = _json.Get<Dictionary<string, string>>(key: hashFunction);
+            return hashFunc[serialiser];
+        }
 
         protected override ISerialiser[] InitialiseAllSerialisers(object key, object salt, HMACHashAlgorithm hashFunction, object info, int maxAge) 
             => new ISerialiser[] 
@@ -64,8 +85,8 @@ namespace HMACTests
             // [Serialiser, URLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.o4Bln1A17yxv6uY8Jf7BUKZceeg",
-                $"{urlsafeEncodedData}.o4Bln1A17yxv6uY8Jf7BUKZceeg",
+                GetExpected(sha1, serialiser),
+                GetExpected(sha1, urlsafeSerialiser),
             };
             TestsOutputs(serialisers, expected);
         }
@@ -79,8 +100,8 @@ namespace HMACTests
             // [TimedSerialiser, TimedURLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.{encodedUnixTime}.myC2PU9USJhV52Sm0xoqmdi/dWo",
-                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.myC2PU9USJhV52Sm0xoqmdi_dWo",
+                GetExpected(sha1, timedSerialiser),
+                GetExpected(sha1, timedUrlsafeSerialiser),
             };
             TestsOutputs(serialisers, expected);
         }
@@ -100,8 +121,8 @@ namespace HMACTests
             // [Serialiser, URLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.PQERg33/tFni59L421IH7mLje0QUZIpfWwwK2nGBjS8",
-                $"{urlsafeEncodedData}.PQERg33_tFni59L421IH7mLje0QUZIpfWwwK2nGBjS8",
+                GetExpected(sha256, serialiser),
+                GetExpected(sha256, urlsafeSerialiser),
             };
             TestsOutputs(serialisers, expected);
         }
@@ -115,8 +136,8 @@ namespace HMACTests
             // [TimedSerialiser, TimedURLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.{encodedUnixTime}.LhAOIwiAo130GPK0xz1Z/2N/Ztru/AgfyBRlyCRRdBE",
-                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.LhAOIwiAo130GPK0xz1Z_2N_Ztru_AgfyBRlyCRRdBE",
+                GetExpected(sha256, timedSerialiser),
+                GetExpected(sha256, timedUrlsafeSerialiser),
             };
             TestsOutputs(serialisers, expected);
         }
@@ -136,8 +157,8 @@ namespace HMACTests
             // [Serialiser, URLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.kMdnRpYh6JmSSTIlIxqM0cwph+uaMK/GdhfAINkA/y0dw/I/7EdDiR5qft6ykMbb",
-                $"{urlsafeEncodedData}.kMdnRpYh6JmSSTIlIxqM0cwph-uaMK_GdhfAINkA_y0dw_I_7EdDiR5qft6ykMbb",
+                GetExpected(sha384, serialiser),
+                GetExpected(sha384, urlsafeSerialiser),
             };
             TestsOutputs(serialisers, expected);
         }
@@ -151,8 +172,8 @@ namespace HMACTests
             // [TimedSerialiser, TimedURLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.{encodedUnixTime}.UkXLRk6qgDIpFG5ZPcvf/93nrqSCwHiSk83t4S1oZ4/M71VnIryhZKJPEOBKybI6",
-                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.UkXLRk6qgDIpFG5ZPcvf_93nrqSCwHiSk83t4S1oZ4_M71VnIryhZKJPEOBKybI6",
+                GetExpected(sha384, timedSerialiser),
+                GetExpected(sha384, timedUrlsafeSerialiser),
             };
             TestsOutputs(serialisers, expected);
         }
@@ -172,8 +193,8 @@ namespace HMACTests
             // [Serialiser, URLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.cb6m0rDv1im8RPOo8QrNOxxOs2EQpM6FlseR2FPD2J+Zi0lOcBn5nLcwVj7NgLrnAsG/f3kfqYIl7XPYS6zEpw",
-                $"{urlsafeEncodedData}.cb6m0rDv1im8RPOo8QrNOxxOs2EQpM6FlseR2FPD2J-Zi0lOcBn5nLcwVj7NgLrnAsG_f3kfqYIl7XPYS6zEpw",
+                GetExpected(sha512, serialiser),
+                GetExpected(sha512, urlsafeSerialiser),
             };
             TestsOutputs(serialisers, expected);
         }
@@ -187,8 +208,8 @@ namespace HMACTests
             // [TimedSerialiser, TimedURLSafeSerialiser]
             string[] expected = new string[] 
             {
-                $"{encodedData}.{encodedUnixTime}.RFxkZ5sKdaJkOnq3z4H365xoB2pZB0CVEl75L/4mat5BD17mbIM8sf4Kof2feuzIbU8TKOfk3QpTVaQ33Hvnyg",
-                $"{urlsafeEncodedData}.{urlsafeEncodedUnixTime}.RFxkZ5sKdaJkOnq3z4H365xoB2pZB0CVEl75L_4mat5BD17mbIM8sf4Kof2feuzIbU8TKOfk3QpTVaQ33Hvnyg",
+                GetExpected(sha512, timedSerialiser),
+                GetExpected(sha512, timedUrlsafeSerialiser),
             };
             TestsOutputs(serialisers, expected);
         }
