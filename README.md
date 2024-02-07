@@ -62,7 +62,7 @@ catch (BadTokenException)
     // Handle bad token
 }
 
-JsonDocument document = payload.jsonDocument;
+JsonDocument document = payload.jsonDoc;
 // or
 string name = payload.Get<string>("Name");
 int age = payload.Get<int>("Age");
