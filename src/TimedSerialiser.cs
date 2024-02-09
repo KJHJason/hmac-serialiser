@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using HMACSerialiser.Errors;
@@ -28,6 +29,11 @@ namespace HMACSerialiser
 			string sep = HMACHelper.DefaultSeparator)
                 : base(key, salt, hashAlgorithm, info, sep)
         {
+            if (maxAge < 0)
+                throw new ArgumentException("maxAge", "Max age must be a positive number");
+            if (maxAge == 0)
+                throw new WarningException("Max age is set to 0. This means that the signature will expire immediately after creation");
+
             _maxAge = maxAge;
         }
 
