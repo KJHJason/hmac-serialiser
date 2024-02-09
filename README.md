@@ -51,7 +51,8 @@ HMACHashAlgorithm hashFunction = HMACHashAlgorithm.SHA1;
 
 var serialiser = new Serialiser(key, salt, hashFunction);
 object data = new { Name = "John Doe", Age = 25 };
-string token = serialiser.Dumps(data); // eyJOYW1lIjoiSm9obiBEb2UiLCJBZ2UiOjI1fQ.m4km5yvsgL1V3fzPrEg/Ay9eX0c
+string token = serialiser.Dumps(data);
+// eyJOYW1lIjoiSm9obiBEb2UiLCJBZ2UiOjI1fQ.m4km5yvsgL1V3fzPrEg/Ay9eX0c
 
 try 
 {
@@ -78,7 +79,8 @@ HMACHashAlgorithm hashFunction = HMACHashAlgorithm.SHA256;
 int maxAge = 3600; // 1 hour in seconds
 var serialiser = new TimedSerialiser(key, salt, maxAge, hashFunction);
 string data = "Message that should not tampered with!";
-string token = serialiser.Dumps(data); // TWVzc2FnZSB0aGF0IHNob3VsZCBub3QgdGFtcGVyZWQgd2l0aCE.MTcwNzI3OTk4Nw.dTOD5GbC/V46IAKKMpIFJQF7kG+7wKjq3aoZWbB9cDE
+string token = serialiser.Dumps(data);
+// TWVzc2FnZSB0aGF0IHNob3VsZCBub3QgdGFtcGVyZWQgd2l0aCE.MTcwNzI3OTk4Nw.dTOD5GbC/V46IAKKMpIFJQF7kG+7wKjq3aoZWbB9cDE
 
 try 
 {
@@ -101,7 +103,8 @@ HMACHashAlgorithm hashFunction = HMACHashAlgorithm.SHA384;
 
 var serialiser = new URLSafeSerialiser(key, salt, hashFunction, info);
 string data = "Note that this message can be still read by users by base64 decoding it!";
-string token = serialiser.Dumps(data); // Tm90ZSB0aGF0IHRoaXMgbWVzc2FnZSBjYW4gYmUgc3RpbGwgcmVhZCBieSB1c2VycyBieSBiYXNlNjQgZGVjb2RpbmcgaXQh.zNYNQ2Uq3OayBPRn6ItYRUzSmCmb5vHbTAfgJPK9GzEHxdrFQen5yLR2HZo7q-Kn
+string token = serialiser.Dumps(data);
+// Tm90ZSB0aGF0IHRoaXMgbWVzc2FnZSBjYW4gYmUgc3RpbGwgcmVhZCBieSB1c2VycyBieSBiYXNlNjQgZGVjb2RpbmcgaXQh.zNYNQ2Uq3OayBPRn6ItYRUzSmCmb5vHbTAfgJPK9GzEHxdrFQen5yLR2HZo7q-Kn
 
 try 
 {
@@ -132,7 +135,8 @@ HMACHashAlgorithm hashFunction = HMACHashAlgorithm.SHA512;
 
 var serialiser = new TimedURLSafeSerialiser(key, salt, maxAge, hashFunction, sep: "!");
 string data = "nurture";
-string token = serialiser.Dumps(data); // bnVydHVyZQ!MTcwNzI4MDA0Mw!8StFXyv9pg6mwvCU7-gef3tgs-QyqeSbZRipryKu7PUyG3DNOhsyjVDKcH3-kFCEvDpQI4DxSleOsm9mV4VW9w
+string token = serialiser.Dumps(data);
+// bnVydHVyZQ!MTcwNzI4MDA0Mw!8StFXyv9pg6mwvCU7-gef3tgs-QyqeSbZRipryKu7PUyG3DNOhsyjVDKcH3-kFCEvDpQI4DxSleOsm9mV4VW9w
 
 try 
 {
