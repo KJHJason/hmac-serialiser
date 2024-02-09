@@ -18,7 +18,7 @@ Furthermore, this library uses HKDF (RFC 5869) to derive the key from the secret
 
 Additionally, from my research and understanding, the key will be hashed with the hash function provided if the key is longer than the block size of the hash function.
 
-On other hand, if the key is shorter than the block size of the hash function, it will be padded with zeros or `0x00` to match the block size.
+On the other hand, if the key is shorter than the block size of the hash function, it will be padded with zeros or `0x00` to match the block size.
 
 Although it is not really a concern due to how HMAC works, it does reduce the effort needed to brute-force the key if it is padded with zeros.
 
@@ -68,7 +68,7 @@ string name = payload.Get<string>("Name");
 int age = payload.Get<int>("Age");
 ```
 
-Signing and verifying a token with a string payload with 1 hour a time limit;
+Signing and verifying a token with a string payload with 1 hour time limit;
 
 ```csharp
 string key = "secret";
@@ -83,7 +83,7 @@ string token = serialiser.Dumps(data); // TWVzc2FnZSB0aGF0IHNob3VsZCBub3QgdGFtcG
 try 
 {
     string message = serialiser.LoadsString(token);
-    Assert.Equal(data, message);
+    Assert.AreEqual(data, message);
 }
 catch (BadTokenException) 
 {
@@ -106,7 +106,7 @@ string token = serialiser.Dumps(data); // Tm90ZSB0aGF0IHRoaXMgbWVzc2FnZSBjYW4gYm
 try 
 {
     string message = serialiser.LoadsString(token);
-    Assert.Equal(data, message);
+    Assert.AreEqual(data, message);
 }
 catch (BadTokenException) 
 {
@@ -137,7 +137,7 @@ string token = serialiser.Dumps(data); // bnVydHVyZQ!MTcwNzI4MDA0Mw!8StFXyv9pg6m
 try 
 {
     string message = serialiser.LoadsString(token);
-    Assert.Equal(data, message);
+    Assert.AreEqual(data, message);
 }
 catch (BadTokenException) 
 {
@@ -147,7 +147,7 @@ catch (BadTokenException)
 
 Also, you can use the included base64 encoders:
 
-However, in my implementation, I have removed the padding `=` from the base64 encoded string to slightly reduce the length of the token.
+However, in my implementation, I have removed the padding `=` from the base64 encoded string to reduce the length of the token slightly.
 
 ```csharp
 using HMACSerialiser.Base64Encoders;
@@ -155,12 +155,12 @@ using HMACSerialiser.Base64Encoders;
 string data = "~~~https://github.com/KJHJason/HMACSerialiser~~~";
 
 string base64Data = Base64Encoder.Encode(data);
-Assert.Equal("fn5+aHR0cHM6Ly9naXRodWIuY29tL0tKSEphc29uL0hNQUNTZXJpYWxpc2Vyfn5+", base64Data);
+Assert.AreEqual("fn5+aHR0cHM6Ly9naXRodWIuY29tL0tKSEphc29uL0hNQUNTZXJpYWxpc2Vyfn5+", base64Data);
 string decodedString = Base64Encoder.DecodeToString(base64);
-Assert.Equal("~~~https://github.com/KJHJason/HMACSerialiser~~~", decodedString);
+Assert.AreEqual("~~~https://github.com/KJHJason/HMACSerialiser~~~", decodedString);
 
 string urlSafeBase64Data = URLSafeBase64Encoder.Encode(data);
-Assert.Equal("fn5-aHR0cHM6Ly9naXRodWIuY29tL0tKSEphc29uL0hNQUNTZXJpYWxpc2Vyfn5-", urlSafeDecodedString);
+Assert.AreEqual("fn5-aHR0cHM6Ly9naXRodWIuY29tL0tKSEphc29uL0hNQUNTZXJpYWxpc2Vyfn5-", urlSafeDecodedString);
 string urlSafeDecodedString = URLSafeBase64Encoder.DecodeToString(urlSafeBase64Data);
-Assert.Equal("~~~https://github.com/KJHJason/HMACSerialiser~~~", urlSafeBase64Data);
+Assert.AreEqual("~~~https://github.com/KJHJason/HMACSerialiser~~~", urlSafeBase64Data);
 ```
