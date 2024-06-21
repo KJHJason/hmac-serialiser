@@ -103,7 +103,7 @@
 //!
 //! ## Contributing
 //!
-//! Contributions are welcome! Feel free to open issues and pull requests on [GitHub](https://github.com/KJHJason/hmac-serialiser-rs).
+//! Contributions are welcome! Feel free to open issues and pull requests on [GitHub](https://github.com/KJHJason/hmac-serialiser/tree/master/rust).
 //!
 //! ```
 

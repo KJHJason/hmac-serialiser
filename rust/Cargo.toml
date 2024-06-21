@@ -7,7 +7,7 @@ authors = [
 ]
 keywords = ["hmac", "itsdangerous", "serialiser", "signing", "jwt"]
 categories = ["cryptography", "authentication"]
-repository = "https://github.com/KJHJason/hmac-serialiser-rs"
+repository = "https://github.com/KJHJason/hmac-serialiser/tree/master/rust"
 license = "MIT"
 edition = "2021"
 
