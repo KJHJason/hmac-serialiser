@@ -11,15 +11,15 @@
     <BaseOutputPath>C:\Nuget</BaseOutputPath>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/KJHJason/HMACSerialiser</RepositoryUrl>
+    <RepositoryUrl>https://github.com/KJHJason/hmac-serialiser/tree/master/csharp</RepositoryUrl>
     <PackAsTool>False</PackAsTool>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE-MIT</PackageLicenseFile>
     <Version>1.0.5</Version>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE.txt">
+    <None Include="..\LICENSE-MIT">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
