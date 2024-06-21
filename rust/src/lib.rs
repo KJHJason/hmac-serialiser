@@ -24,21 +24,21 @@
 //! ```rust
 //! use hmac_serialiser::{Encoder, HmacSigner, KeyInfo, Payload, Algorithm};
 //! use serde::{Serialize, Deserialize};
-//! 
+//!
 //! #[derive(Serialize, Deserialize, Debug)]
 //! struct UserData {
 //!     // Add your data fields here
 //!     username: String,
 //!     email: String,
 //! }
-//! 
+//!
 //! impl Payload for UserData {
 //!     fn get_exp(&self) -> Option<chrono::DateTime<chrono::Utc>> {
 //!         // Add logic to retrieve expiration time if needed
 //!         None
 //!     }
 //! }
-//! 
+//!
 //! fn main() {
 //!     // Define your secret key, salt, and optional info
 //!     let key_info = KeyInfo {
@@ -46,16 +46,16 @@
 //!         salt: b"your_salt".to_vec(),
 //!         info: vec![], // empty info
 //!     };
-//! 
+//!
 //!     // Initialize the HMAC signer
 //!     let signer = HmacSigner::new(key_info, Algorithm::SHA256, Encoder::UrlSafeNoPadding);
-//! 
+//!
 //!     // Serialize your data
 //!     let user_data = UserData {
 //!         username: "user123".to_string(),
 //!         email: "user123@example.com".to_string(),
 //!     };
-//! 
+//!
 //!     // Sign the data (safe to use by clients)
 //!     let token = signer.sign(&user_data);
 //!     println!("Token: {}", token);
