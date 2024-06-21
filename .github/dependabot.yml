@@ -11,3 +11,5 @@ updates:
       interval: daily
   - package-ecosystem: nuget
     directory: /csharp/src
+    schedule:
+      interval: daily
