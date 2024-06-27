@@ -25,15 +25,6 @@ Additionally, the data serialisation and deserialisation uses the [serde](https:
 
 ## Sample Usage
 
-Add this to your `Cargo.toml`:
-
-```toml
-[dependencies]
-hmac-serialiser = { version = "0.3.0", features = ["rust_crypto"] }
-```
-
-Note: `features = ["rust_crypto"]` is optional. If not specified, it will default to `rust_crypto`.
-
 ```rust
 use hmac_serialiser::{Encoder, HmacSigner, KeyInfo, Payload, Algorithm};
 use serde::{Serialize, Deserialize};

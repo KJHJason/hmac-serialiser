@@ -3,7 +3,7 @@
 //! `hmac-serialiser` is a Rust library for generating and verifying HMAC signatures for secure data transmission.
 //!
 //! Regarding the cryptographic implementations, you can choose which implementations to use from via the `features` flag in the `Cargo.toml` file:
-//! - `rust_crypto`
+//! - `rust_crypto` (default)
 //!   - the underlying [SHA1](https://crates.io/crates/sha1), [SHA2](https://crates.io/crates/sha2), [HMAC](https://crates.io/crates/hmac), and [HKDF](https://crates.io/crates/hkdf) implementations are by [RustCrypto](https://github.com/RustCrypto).
 //! - `ring`
 //!   - The underlying SHA1, SHA2, HMAC, and HKDF implementations are from the [ring](https://crates.io/crates/ring) crate.
@@ -119,7 +119,7 @@ use serde::{Deserialize, Serialize};
 pub use algorithm::Algorithm;
 pub use errors::Error;
 
-#[cfg(feature = "rust_crypto")]
+#[cfg(not(feature = "ring"))]
 use hmac::Mac;
 
 #[cfg(feature = "ring")]
@@ -226,9 +226,9 @@ impl Default for KeyInfo {
 /// The `HmacSigner` struct is used for signing and verifying the payload using HMAC signatures.
 #[derive(Debug, Clone)]
 pub struct HmacSigner {
-    #[cfg(feature = "rust_crypto")]
+    #[cfg(not(feature = "ring"))]
     expanded_key: Vec<u8>,
-    #[cfg(feature = "rust_crypto")]
+    #[cfg(not(feature = "ring"))]
     algo: Algorithm,
     #[cfg(feature = "ring")]
     expanded_key: hmac::Key,
@@ -236,7 +236,7 @@ pub struct HmacSigner {
     encoder: general_purpose::GeneralPurpose,
 }
 
-#[cfg(feature = "rust_crypto")]
+#[cfg(not(feature = "ring"))]
 macro_rules! get_hmac {
     ($self:ident, $D:ty) => {
         hmac::Hmac::<$D>::new_from_slice(&$self.expanded_key)
@@ -244,7 +244,7 @@ macro_rules! get_hmac {
     };
 }
 
-#[cfg(feature = "rust_crypto")]
+#[cfg(not(feature = "ring"))]
 macro_rules! hmac_sign {
     ($self:ident, $payload:ident, $D:ty) => {{
         let mut mac = get_hmac!($self, $D);
@@ -253,7 +253,7 @@ macro_rules! hmac_sign {
     }};
 }
 
-#[cfg(feature = "rust_crypto")]
+#[cfg(not(feature = "ring"))]
 macro_rules! hmac_verify {
     ($self:ident, $payload:ident, $signature:ident, $D:ty) => {{
         let mut mac = get_hmac!($self, $D);
@@ -291,7 +291,7 @@ impl HmacSigner {
     }
 
     #[inline]
-    #[cfg(feature = "rust_crypto")]
+    #[cfg(not(feature = "ring"))]
     fn sign_payload(&self, payload: &[u8]) -> Vec<u8> {
         match self.algo {
             Algorithm::SHA1 => hmac_sign!(self, payload, sha1::Sha1),
@@ -302,7 +302,7 @@ impl HmacSigner {
     }
 
     #[inline]
-    #[cfg(feature = "rust_crypto")]
+    #[cfg(not(feature = "ring"))]
     fn verify(&self, payload: &[u8], signature: &[u8]) -> bool {
         match self.algo {
             Algorithm::SHA1 => hmac_verify!(self, payload, signature, sha1::Sha1),

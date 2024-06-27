@@ -1,6 +1,6 @@
 use crate::algorithm::Algorithm;
 
-#[cfg(feature = "rust_crypto")]
+#[cfg(not(feature = "ring"))]
 use hkdf::Hkdf;
 
 #[cfg(feature = "ring")]
@@ -10,7 +10,7 @@ pub struct HkdfWrapper {
     algo: Algorithm,
 }
 
-#[cfg(feature = "rust_crypto")]
+#[cfg(not(feature = "ring"))]
 macro_rules! hkdf_expand {
     ($self:ident, $ikm:ident, $salt:ident, $info:ident, $D:ty) => {{
         let hk = Hkdf::<$D>::new(Some($salt), $ikm);
@@ -26,7 +26,7 @@ impl HkdfWrapper {
         Self { algo }
     }
 
-    #[cfg(feature = "rust_crypto")]
+    #[cfg(not(feature = "ring"))]
     pub fn expand(&self, ikm: &[u8], salt: &[u8], info: &[u8]) -> Vec<u8> {
         match self.algo {
             Algorithm::SHA1 => hkdf_expand!(self, ikm, salt, info, sha1::Sha1),
