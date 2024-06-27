@@ -16,7 +16,7 @@ Additionally, the key used in the HMAC algorithm is expanded using HKDF to addre
 Moreover, the expanded key is expanded to the length of the hash function's output size that is used in the HMAC algorithm to avoid key padding which can reduce the efforts needed to brute-force.
 
 Regarding the cryptographic implementations, you can choose which implementations to use from via the `features` flag in the `Cargo.toml` file:
-- `rust_crypto`
+- `rust_crypto` (default)
   - the underlying [SHA1](https://crates.io/crates/sha1), [SHA2](https://crates.io/crates/sha2), [HMAC](https://crates.io/crates/hmac), and [HKDF](https://crates.io/crates/hkdf) implementations are by [RustCrypto](https://github.com/RustCrypto).
 - `ring`
   - The underlying SHA1, SHA2, HMAC, and HKDF implementations are from the [ring](https://crates.io/crates/ring) crate.
@@ -26,10 +26,13 @@ Additionally, the data serialisation and deserialisation uses the [serde](https:
 ## Sample Usage
 
 Add this to your `Cargo.toml`:
+
 ```toml
 [dependencies]
 hmac-serialiser = { version = "0.3.0", features = ["rust_crypto"] }
 ```
+
+Note: `features = ["rust_crypto"]` is optional. If not specified, it will default to `rust_crypto`.
 
 ```rust
 use hmac_serialiser::{Encoder, HmacSigner, KeyInfo, Payload, Algorithm};
