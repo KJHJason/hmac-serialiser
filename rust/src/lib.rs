@@ -2,11 +2,13 @@
 //!
 //! `hmac-serialiser` is a Rust library for generating and verifying HMAC signatures for secure data transmission.
 //!
-//! Regarding the cryptographic implementations, the underlying [SHA1](https://crates.io/crates/sha1),
-//! [SHA2](https://crates.io/crates/sha2), [HMAC](https://crates.io/crates/hmac),
-//! and [HKDF](https://crates.io/crates/hkdf) implementations are by [RustCrypto](https://github.com/RustCrypto).
+//! Regarding the cryptographic implementations, you can choose which implementations to use from via the `features` flag in the `Cargo.toml` file:
+//! - `rust_crypto`
+//!   - the underlying [SHA1](https://crates.io/crates/sha1), [SHA2](https://crates.io/crates/sha2), [HMAC](https://crates.io/crates/hmac), and [HKDF](https://crates.io/crates/hkdf) implementations are by [RustCrypto](https://github.com/RustCrypto).
+//! - `ring`
+//!   - The underlying SHA1, SHA2, HMAC, and HKDF implementations are from the [ring](https://crates.io/crates/ring) crate.
 //!
-//! Additionally, the data serialisation and deserialisation uses the [serde](https://crates.io/crates/serde) crate and
+//! Additionally, the data serialisation and de-serialisation uses the [serde](https://crates.io/crates/serde) crate and
 //! the signed data is then encoded or decoded using the [base64](https://crates.io/crates/base64) crate.
 //!
 //! ## License
@@ -109,15 +111,21 @@
 
 pub mod algorithm;
 pub mod errors;
-mod hkdf;
+pub mod hkdf;
 
-use algorithm::Algorithm;
 use base64::{engine::general_purpose, Engine as _};
-use errors::Error;
-use hmac::Mac;
 use serde::{Deserialize, Serialize};
 
-const DELIM: char = '.';
+pub use algorithm::Algorithm;
+pub use errors::Error;
+
+#[cfg(feature = "rust_crypto")]
+use hmac::Mac;
+
+#[cfg(feature = "ring")]
+use ring::hmac;
+
+pub const DELIM: char = '.';
 
 /// An enum for defining the encoding scheme for the payload and the signature.
 ///
@@ -218,11 +226,17 @@ impl Default for KeyInfo {
 /// The `HmacSigner` struct is used for signing and verifying the payload using HMAC signatures.
 #[derive(Debug, Clone)]
 pub struct HmacSigner {
+    #[cfg(feature = "rust_crypto")]
     expanded_key: Vec<u8>,
+    #[cfg(feature = "rust_crypto")]
     algo: Algorithm,
+    #[cfg(feature = "ring")]
+    expanded_key: hmac::Key,
+
     encoder: general_purpose::GeneralPurpose,
 }
 
+#[cfg(feature = "rust_crypto")]
 macro_rules! get_hmac {
     ($self:ident, $D:ty) => {
         hmac::Hmac::<$D>::new_from_slice(&$self.expanded_key)
@@ -230,6 +244,7 @@ macro_rules! get_hmac {
     };
 }
 
+#[cfg(feature = "rust_crypto")]
 macro_rules! hmac_sign {
     ($self:ident, $payload:ident, $D:ty) => {{
         let mut mac = get_hmac!($self, $D);
@@ -238,6 +253,7 @@ macro_rules! hmac_sign {
     }};
 }
 
+#[cfg(feature = "rust_crypto")]
 macro_rules! hmac_verify {
     ($self:ident, $payload:ident, $signature:ident, $D:ty) => {{
         let mut mac = get_hmac!($self, $D);
@@ -257,13 +273,25 @@ impl HmacSigner {
             &key_info.salt,
             &key_info.info,
         );
+
+        #[cfg(feature = "ring")]
+        {
+            let expanded_key = hmac::Key::new(algo.to_hmac(), &expanded_key);
+            return Self {
+                expanded_key,
+                encoder: encoder.get_encoder(),
+            };
+        }
+        #[cfg(not(feature = "ring"))]
         Self {
             expanded_key,
             algo,
             encoder: encoder.get_encoder(),
         }
     }
+
     #[inline]
+    #[cfg(feature = "rust_crypto")]
     fn sign_payload(&self, payload: &[u8]) -> Vec<u8> {
         match self.algo {
             Algorithm::SHA1 => hmac_sign!(self, payload, sha1::Sha1),
@@ -274,6 +302,7 @@ impl HmacSigner {
     }
 
     #[inline]
+    #[cfg(feature = "rust_crypto")]
     fn verify(&self, payload: &[u8], signature: &[u8]) -> bool {
         match self.algo {
             Algorithm::SHA1 => hmac_verify!(self, payload, signature, sha1::Sha1),
@@ -281,6 +310,18 @@ impl HmacSigner {
             Algorithm::SHA384 => hmac_verify!(self, payload, signature, sha2::Sha384),
             Algorithm::SHA512 => hmac_verify!(self, payload, signature, sha2::Sha512),
         }
+    }
+
+    #[inline]
+    #[cfg(feature = "ring")]
+    fn sign_payload(&self, payload: &[u8]) -> Vec<u8> {
+        hmac::sign(&self.expanded_key, payload).as_ref().to_vec()
+    }
+
+    #[inline]
+    #[cfg(feature = "ring")]
+    fn verify(&self, payload: &[u8], signature: &[u8]) -> bool {
+        hmac::verify(&self.expanded_key, payload, signature).is_ok()
     }
 }
 
@@ -302,7 +343,7 @@ impl HmacSigner {
     ///
     /// Sample Usage:
     /// ```rust
-    /// use hmac_serialiser::{HmacSigner, KeyInfo, Encoder, algorithm::Algorithm, errors::Error, Payload};
+    /// use hmac_serialiser::{HmacSigner, KeyInfo, Encoder, algorithm::Algorithm, Error, Payload};
     /// use serde::{Serialize, Deserialize};
     ///
     /// #[derive(Serialize, Deserialize, Debug)]
@@ -372,7 +413,7 @@ impl HmacSigner {
     ///
     /// Sample Usage:
     /// ```rust
-    /// use hmac_serialiser::{HmacSigner, KeyInfo, Encoder, algorithm::Algorithm, errors::Error, Payload};
+    /// use hmac_serialiser::{HmacSigner, KeyInfo, Encoder, algorithm::Algorithm, Error, Payload};
     /// use serde::{Serialize, Deserialize};
     ///
     /// #[derive(Serialize, Deserialize, Debug)]
@@ -402,166 +443,5 @@ impl HmacSigner {
         let signature = self.sign_payload(token.as_bytes());
         let signature = self.encoder.encode(&signature);
         format!("{}{}{}", token, DELIM, signature)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use chrono::{Duration, Utc};
-
-    #[derive(Serialize, Deserialize, Debug)]
-    struct TestClaim {
-        #[serde(with = "chrono::serde::ts_seconds")]
-        exp: chrono::DateTime<Utc>,
-        data: String,
-    }
-
-    impl Payload for TestClaim {
-        fn get_exp(&self) -> Option<chrono::DateTime<Utc>> {
-            Some(self.exp)
-        }
-    }
-
-    fn setup(salt: Vec<u8>, info: Vec<u8>, algo: Algorithm, encoder: Encoder) -> HmacSigner {
-        let key_info = KeyInfo {
-            key: b"test_secret_key".to_vec(),
-            salt,
-            info,
-        };
-        HmacSigner::new(key_info, algo, encoder)
-    }
-
-    #[test]
-    fn test_sign_and_unsign_valid_token() {
-        let signer = setup(vec![], vec![], Algorithm::SHA256, Encoder::UrlSafeNoPadding);
-        let claim = TestClaim {
-            exp: Utc::now() + Duration::hours(1),
-            data: "test_data".to_string(),
-        };
-
-        let token = signer.sign(&claim);
-        let verified_claim: TestClaim = signer.unsign(&token).unwrap();
-        println!("Token: {}", token);
-        println!("Verified claim: {:?}", verified_claim);
-        assert_eq!(verified_claim.data, claim.data);
-    }
-
-    #[test]
-    fn test_invalid_token() {
-        let data = "tttttttttttttttttttttttttttttttttttttttttt";
-        let expected_error = Error::InvalidInput(data.to_string());
-        let signer = setup(
-            vec![1, 2, 3],
-            vec![4, 5, 6],
-            Algorithm::SHA256,
-            Encoder::UrlSafe,
-        );
-        match signer.unsign::<TestClaim>(&data) {
-            Ok(_) => panic!("Expected error"),
-            Err(e) => assert_eq!(e, expected_error),
-        };
-    }
-
-    #[test]
-    fn test_invalid_token_with_valid_signature() {
-        let signer = setup(
-            vec![1, 2, 3],
-            vec![4, 5, 6],
-            Algorithm::SHA256,
-            Encoder::UrlSafe,
-        );
-        let claim = TestClaim {
-            exp: Utc::now() + Duration::hours(1),
-            data: "test_data".to_string(),
-        };
-
-        let token = signer.sign(&claim);
-        let valid_signature = token.split('.').collect::<Vec<&str>>()[1];
-        let invalid_token = format!("{}.{}", "bad_data", valid_signature);
-        println!("Invalid token: {}", invalid_token);
-        println!("Valid token: {}", token);
-
-        let result: Result<TestClaim, Error> = signer.unsign(&invalid_token);
-        assert!(matches!(result, Err(Error::InvalidToken)));
-    }
-
-    #[test]
-    fn test_unsign_expired_token() {
-        let signer = setup(
-            vec![1, 2, 3],
-            vec![4, 5, 6],
-            Algorithm::SHA256,
-            Encoder::UrlSafe,
-        );
-        let claim = TestClaim {
-            exp: Utc::now() - Duration::hours(1),
-            data: "test_data".to_string(),
-        };
-
-        let token = signer.sign(&claim);
-        let result: Result<TestClaim, Error> = signer.unsign(&token);
-
-        assert!(matches!(result, Err(Error::TokenExpired)));
-    }
-
-    #[test]
-    fn test_unsign_invalid_signature() {
-        let signer = setup(
-            vec![1, 2, 3],
-            vec![4, 5, 6],
-            Algorithm::SHA256,
-            Encoder::UrlSafe,
-        );
-        let claim = TestClaim {
-            exp: Utc::now() + Duration::hours(1),
-            data: "test_data".to_string(),
-        };
-
-        let token = signer.sign(&claim);
-        let mut invalid_token = token.clone();
-        invalid_token.push_str("invalid");
-
-        let result: Result<TestClaim, Error> = signer.unsign(&invalid_token);
-
-        assert!(matches!(result, Err(Error::InvalidSignature)));
-    }
-
-    #[test]
-    fn test_unsign_malformed_token() {
-        let signer = setup(
-            vec![1, 2, 3],
-            vec![4, 5, 6],
-            Algorithm::SHA256,
-            Encoder::UrlSafe,
-        );
-
-        let malformed_token = "malformed.token";
-
-        let result: Result<TestClaim, Error> = signer.unsign(malformed_token);
-
-        assert!(matches!(result, Err(Error::InvalidSignature)));
-    }
-
-    #[test]
-    fn test_unsign_invalid_base64_signature() {
-        let signer = setup(
-            vec![1, 2, 3],
-            vec![4, 5, 6],
-            Algorithm::SHA256,
-            Encoder::UrlSafe,
-        );
-        let claim = TestClaim {
-            exp: Utc::now() + Duration::hours(1),
-            data: "test_data".to_string(),
-        };
-
-        let token = signer.sign(&claim);
-        let parts: Vec<&str> = token.split(DELIM).collect();
-        let invalid_token = format!("{}.{}", parts[0], "invalid_base64");
-
-        let result: Result<TestClaim, Error> = signer.unsign(&invalid_token);
-
-        assert!(matches!(result, Err(Error::InvalidSignature)));
     }
 }

@@ -1,10 +1,16 @@
 use crate::algorithm::Algorithm;
+
+#[cfg(feature = "rust_crypto")]
 use hkdf::Hkdf;
+
+#[cfg(feature = "ring")]
+use ring::hkdf;
 
 pub struct HkdfWrapper {
     algo: Algorithm,
 }
 
+#[cfg(feature = "rust_crypto")]
 macro_rules! hkdf_expand {
     ($self:ident, $ikm:ident, $salt:ident, $info:ident, $D:ty) => {{
         let hk = Hkdf::<$D>::new(Some($salt), $ikm);
@@ -20,6 +26,7 @@ impl HkdfWrapper {
         Self { algo }
     }
 
+    #[cfg(feature = "rust_crypto")]
     pub fn expand(&self, ikm: &[u8], salt: &[u8], info: &[u8]) -> Vec<u8> {
         match self.algo {
             Algorithm::SHA1 => hkdf_expand!(self, ikm, salt, info, sha1::Sha1),
@@ -28,92 +35,18 @@ impl HkdfWrapper {
             Algorithm::SHA512 => hkdf_expand!(self, ikm, salt, info, sha2::Sha512),
         }
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::algorithm::Algorithm;
-    use rand;
-    use rand::Rng as _;
+    #[cfg(feature = "ring")]
+    pub fn expand(&self, ikm: &[u8], salt: &[u8], info: &[u8]) -> Vec<u8> {
+        let hkdf_algo = self.algo.to_hkdf();
+        let prk = hkdf::Salt::new(hkdf_algo, salt).extract(ikm);
 
-    pub fn get_random_bytes(length: usize) -> Vec<u8> {
-        let mut random_bytes = vec![0u8; length];
-        rand::thread_rng().fill(&mut random_bytes[..]);
-        random_bytes
-    }
-
-    fn bytes_to_hex(bytes: &[u8]) -> String {
-        bytes.iter().map(|b| format!("{:02x}", b)).collect()
-    }
-
-    #[test]
-    fn test_empty_key_hkdf_expand() {
-        let salt = b"";
-        let ikm = b"";
-        let info = b"";
-        let algo = Algorithm::SHA1;
-        let algo_output_length = algo.output_length();
-        let hkdf = HkdfWrapper::new(algo);
-        let okm = hkdf.expand(ikm, salt, info);
-
-        println!("sha1 okm: {}", bytes_to_hex(&okm));
-        assert_eq!(okm.len(), algo_output_length);
-    }
-
-    #[test]
-    fn test_hdkf_expand_with_salt() {
-        let salt = get_random_bytes(32);
-        let ikm = b"";
-        let info = b"";
-        let algo = Algorithm::SHA256;
-        let algo_output_length = algo.output_length();
-        let hkdf = HkdfWrapper::new(algo);
-        let okm = hkdf.expand(ikm, &salt, info);
-
-        println!("sha256 okm: {}", bytes_to_hex(&okm));
-        assert_eq!(okm.len(), algo_output_length);
-    }
-
-    #[test]
-    fn test_hdkf_expand_with_ikm() {
-        let salt = b"";
-        let ikm = b"kjhjason";
-        let info = b"";
-        let algo = Algorithm::SHA384;
-        let algo_output_length = algo.output_length();
-        let hkdf = HkdfWrapper::new(algo);
-        let okm = hkdf.expand(ikm.as_ref(), salt, info);
-
-        println!("sha384 okm: {}", bytes_to_hex(&okm));
-        assert_eq!(okm.len(), algo_output_length);
-    }
-
-    #[test]
-    fn test_hdkf_expand_with_info() {
-        let salt = b"";
-        let ikm = b"";
-        let info = b"kjhjason";
-        let algo = Algorithm::SHA512;
-        let algo_output_length = algo.output_length();
-        let hkdf = HkdfWrapper::new(algo);
-        let okm = hkdf.expand(ikm, salt, info);
-
-        println!("sha512 okm: {}", bytes_to_hex(&okm));
-        assert_eq!(okm.len(), algo_output_length);
-    }
-
-    #[test]
-    fn test_hdkf_expand_with_all() {
-        let salt = b"kjhjason.com";
-        let ikm = b"jason";
-        let info = b"kjhjason";
-        let algo = Algorithm::SHA256;
-        let algo_output_length = algo.output_length();
-        let hkdf = HkdfWrapper::new(algo);
-        let okm = hkdf.expand(ikm, salt, info);
-
-        println!("sha256 okm: {}", bytes_to_hex(&okm));
-        assert_eq!(okm.len(), algo_output_length);
+        let mut okm = vec![0u8; self.algo.output_length()];
+        let okm_slice = &mut okm[..];
+        prk.expand(&[info], self.algo.to_hmac())
+            .expect("could not expand key due to possibly invalid length")
+            .fill(okm_slice)
+            .expect("could not fill key due to possibly invalid length");
+        okm
     }
 }
