@@ -1,0 +1,26 @@
+name: Test Rust Implementation
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./rust/src
+    
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+
+    - name: Test default/rust_crypto feature
+      run: cargo test -- --show-output
+
+    - name: Test ring feature
+      run: cargo test --features ring --no-default-features -- --show-output

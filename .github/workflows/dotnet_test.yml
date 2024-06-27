@@ -5,9 +5,9 @@ name: Test C# Implementation in .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build-and-test:
@@ -19,7 +19,7 @@ jobs:
         working-directory: ./csharp/src
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
