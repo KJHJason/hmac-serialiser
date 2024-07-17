@@ -6,8 +6,12 @@ name: Test C# Implementation in .NET
 on:
   push:
     branches: ["master"]
+    paths:
+      - 'csharp/**'
   pull_request:
     branches: ["master"]
+    paths:
+      - 'csharp/**'
 
 jobs:
   build-and-test:

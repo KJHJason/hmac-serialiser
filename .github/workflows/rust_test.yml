@@ -3,8 +3,12 @@ name: Test Rust Implementation
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - 'rust/**'
   pull_request:
     branches: [ "master" ]
+    paths:
+      - 'rust/**'
 
 jobs:
   build-and-test:
@@ -20,7 +24,9 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
 
     - name: Test default/rust_crypto feature
+      # to pass '--show-output' as a value, use '-- --show-output'
       run: cargo test -- --show-output
 
     - name: Test ring feature
-      run: cargo test --features ring --no-default-features -- --show-output
+      # to pass '--show-output' as a value, use '-- --show-output'
+      run: cargo test --features ring -- --show-output
